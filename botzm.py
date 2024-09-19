@@ -149,7 +149,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     #if not current_state is ClientState.MAIN_MENU:
     tt = await message.answer(Option_select_message_str, reply_markup=keyboard)
     await message.delete()
-   #await tt.delete()
+    #await tt.delete()
     await state.set_state(ClientState.MAIN_MENU) 
     
 
