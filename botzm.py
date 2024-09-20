@@ -13,6 +13,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.methods.delete_message import DeleteMessage
 
+
+
+# Redis storage
 # from aiogram.fsm.storage.redis import RedisStorage
 
 # storage = RedisStorage(
@@ -24,6 +27,14 @@ from aiogram.methods.delete_message import DeleteMessage
 # )
 
 # dp = Dispatcher(bot, storage=storage)
+#-------------------------------------------------------------
+
+# Postgres storage
+# from AiogramStorages.storages import PGStorage
+
+# storage = PGStorage(username='YourUser', password='YourPassword', db_name='YourDbName')  
+# dp = Dispatcher(bot, storage=storage)
+# ------------------------------------------------------------
 
 
 
