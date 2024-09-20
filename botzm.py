@@ -213,8 +213,7 @@ async def location_handler(message: Message, state: FSMContext) -> None:
    
  
 @form_router.message(ClientState.PERS_CAB_AUTH)
-# async def auth_handler(message: Message, state: FSMContext) -> None:
-#     await  message.delete()
+ 
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     
@@ -242,43 +241,10 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     
     await state.set_state(ClientState.PERS_CAB_AUTH)
     await AddMessToRemove(message)
-     
+      
    
-   
-
-
+  
  
-# @form_router.message() 
-# async def restart_handler(message: Message, state = FSMContext) -> None:
-
-#     current_state = await state.get_state()
-#     logging.info(current_state)
-#     if current_state == None:
-#       await  command_start_handler(message, state) 
- 
-
-
-
-
-# @dp.message()
-# async def echo_handler(message: Message) -> None:
-#     """
-#     Handler will forward receive a message back to the sender
-
-#     By default, message handler will handle all message types (like a text, photo, sticker etc.)
-#     """
-#     try:
-#         # Send a copy of the received message
-       
-#         await message.answer(config.LANG_RU["Location1_Mess"])
-#         await message.answer_location(config.LANG_RU["Location1"][0], config.LANG_RU["Location1"][1])
-#         #await message.send_copy(chat_id=message.chat.id)
-        
-#     except TypeError:
-#         # But not all the types is supported to be copied so need to handle it
-#         await message.anwer("Nice try!")
-        
-
 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
