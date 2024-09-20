@@ -1,0 +1,13 @@
+[Unit]
+Description=zarmedbot
+After=network.target
+
+[Service]
+User=root
+Type=idle
+ExecStart=/home/pyenv1/bin/python /home/zmbot/zarmed_tellegram_bot/botzm.py
+
+[Install]
+WantedBy=multi-user.target
+
+ 
