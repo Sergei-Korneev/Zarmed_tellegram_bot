@@ -16,6 +16,7 @@ from aiogram.fsm.state import StatesGroup, State
 # Bot token can be obtained via https://t.me/BotFather
 #TOKEN = config.TELEGRAM_BOT_TOKEN
 TOKEN = getenv("BOT_TOKEN")
+ 
 
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
@@ -24,6 +25,7 @@ dp = Dispatcher()
 
 class ClientState(StatesGroup):
     LANG_SELECTION = State()
+    START_MESS = State()
     MAIN_MENU = State()
     MAIN_MENU_LOCATION = State()
     PERS_CAB_AUTH = State()
@@ -59,49 +61,63 @@ async def command_start_handler(message: Message, state = FSMContext) -> None:
     # method automatically or call API method directly via
     # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
  
-    await message.delete()
+    
 
-    kb = [
-        [KeyboardButton(text="🇬🇧 English")],
-        [KeyboardButton(text="🇺🇿 Uzbek")],
-        [KeyboardButton(text="🇷🇺 Russian")]         
-    ]
-
-    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     msg = \
     config.LANG_RU["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU["Hello_mess"] + '\n\n' + \
     config.LANG_EN["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_EN["Hello_mess"] + '\n\n' + \
     config.LANG_UZ["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_UZ["Hello_mess"] 
  
-    await message.answer(msg, reply_markup=keyboard)
-    await state.set_state(ClientState.LANG_SELECTION) 
     
+    await state.set_state(ClientState.START_MESS) 
+    await message.answer(msg)
+    await lang_sel_handler(message, state)  
+   
      
-
-
  
+@form_router.message(ClientState.START_MESS)
+async def lang_sel_handler(message: Message, state: FSMContext) -> None:
+        
+        kb = [
+        
+        [KeyboardButton(text="🇺🇿 Uzbek")],
+        [KeyboardButton(text="🇷🇺 Russian")],
+        [KeyboardButton(text="🇬🇧 English")]         
+        ]
+        keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+        
+
+        await message.answer(
+             config.LANG_RU["Select_Lang_err"] + "\n\n" +
+             config.LANG_EN["Select_Lang_err"] + "\n\n" +
+             config.LANG_UZ["Select_Lang_err"] + "\n\n" 
+             , reply_markup=keyboard
+        )
+         
+        await state.set_state(ClientState.LANG_SELECTION)
+
 
 
 @form_router.message(ClientState.LANG_SELECTION)
 async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
-        
+        #await  message.delete()
         if message.text != "🇬🇧 English" and message.text != "🇺🇿 Uzbek" and message.text != "🇷🇺 Russian":
-          await message.answer(
-             config.LANG_RU["Select_Lang_err"] + "\n\n" +
-             config.LANG_EN["Select_Lang_err"] + "\n\n" +
-             config.LANG_UZ["Select_Lang_err"] + "\n\n" 
-          )
+         
           await message.delete()
+          await lang_sel_handler(message, state ) 
           return
         
-         
+
+
+
         # current_state = await state.get_state()
         # logging.info("e %r", current_state)
         data = await state.update_data(LANG_SELECTION=message.text)
         # data1 =  await state.get_data()
         # logging.info( data1["LANG_SELECTION"])
         await state.set_state(ClientState.MAIN_MENU)
-       # await message.answer("", reply_markup=ReplyKeyboardRemove())
+        #await message.answer("", reply_markup=ReplyKeyboardRemove())
+ 
         await main_menu_handler(message, state)
         
     
@@ -124,13 +140,16 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
     if message.text == Option_language_str:
        await state.clear()
-       await command_start_handler(message, state) 
+       #await state.set_state(ClientState.START_MESS)
+       await state.set_state(ClientState.LANG_SELECTION) 
+       await after_lang_sel_handler(message, state)   
+       #await message.delete()
        return
  
     if message.text == Option_cabinet_str:
        #await state.clear()
        await state.set_state(ClientState.PERS_CAB_AUTH)
-       await message.delete()
+       #await message.delete()
        await pers_cab_auth_handler(message, state) 
        return
 
@@ -182,7 +201,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     
     cancel_str = await Translate_Message("Cancel", state)
     Pers_area_hello_str = await Translate_Message("Pers_area_hello", state)
-    
+    Pers_area_scan_qr_str = await Translate_Message("Pers_area_scan_qr", state)
+
     if message.text == cancel_str:
        await state.set_state(ClientState.MAIN_MENU) 
        await main_menu_handler(message, state) 
@@ -190,7 +210,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
  
     kb = [
-        [KeyboardButton(text=cancel_str)]        
+        
+        [KeyboardButton(text=Pers_area_scan_qr_str)],
+        [KeyboardButton(text=cancel_str)]       
     ]
 
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
