@@ -15,7 +15,7 @@ from aiogram.methods.delete_message import DeleteMessage
 
 
 
-# Redis storage
+# ------------------  Redis storage ---------------------
 # from aiogram.fsm.storage.redis import RedisStorage
 
 # storage = RedisStorage(
@@ -27,9 +27,9 @@ from aiogram.methods.delete_message import DeleteMessage
 # )
 
 # dp = Dispatcher(bot, storage=storage)
-#-------------------------------------------------------------
+# -------------------------------------------------------
 
-# Postgres storage
+# ------------------- Postgres storage ---------------------
 # from AiogramStorages.storages import PGStorage
 
 # storage = PGStorage(username='YourUser', password='YourPassword', db_name='YourDbName')  
