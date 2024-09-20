@@ -48,6 +48,9 @@ form_router = Router()
 dp = Dispatcher()
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 messages_del = []
+LANG_EN_BUT = "🇬🇧 English"
+LANG_UZ_BUT = "🇺🇿 Uzbek"
+LANG_RU_BUT = "🇷🇺 Russian"
 
 
 class ClientState(StatesGroup):
@@ -63,13 +66,13 @@ async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
     data =  await state.get_data() 
     lang = data["LANG_SELECTION"]  
 
-    if lang == "🇬🇧 English":
+    if lang == LANG_EN_BUT:
        return config.LANG_EN[MessageName]
         
-    if lang == "🇺🇿 Uzbek":
+    if lang == LANG_UZ_BUT:
        return config.LANG_UZ[MessageName]
     
-    if lang == "🇷🇺 Russian":
+    if lang == LANG_RU_BUT:
        return config.LANG_RU[MessageName]
     
 
@@ -115,9 +118,9 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
         
         kb = [
         
-        [KeyboardButton(text="🇺🇿 Uzbek")],
-        [KeyboardButton(text="🇷🇺 Russian")],
-        [KeyboardButton(text="🇬🇧 English")]         
+        [KeyboardButton(text=LANG_UZ_BUT)],
+        [KeyboardButton(text=LANG_RU_BUT)],
+        [KeyboardButton(text=LANG_EN_BUT)]         
         ]
         keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
         
@@ -139,7 +142,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 @form_router.message(ClientState.LANG_SELECTION)
 async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
         
-        if message.text != "🇬🇧 English" and message.text != "🇺🇿 Uzbek" and message.text != "🇷🇺 Russian":
+        if message.text != LANG_EN_BUT and message.text != LANG_UZ_BUT and message.text != LANG_RU_BUT:
          
           await AddMessToRemove(message)
           await RemoveMessages()
