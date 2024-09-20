@@ -11,6 +11,7 @@ from aiogram.types import Message
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,  ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+from aiogram.methods.delete_message import DeleteMessage
 
 
 # Bot token can be obtained via https://t.me/BotFather
@@ -21,6 +22,8 @@ TOKEN = getenv("BOT_TOKEN")
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+messages_del = []
 
 
 class ClientState(StatesGroup):
@@ -47,8 +50,14 @@ async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
     
 
 
+async def RemoveMessages():
+    for i in messages_del:
+     await bot.delete_message(chat_id=i[0],message_id=i[1])
+    messages_del.clear()
 
-
+async def AddMessToRemove(message: Message = None):
+    if message != None:
+      messages_del.append([message.chat.id, message.message_id])
  
 @form_router.message(CommandStart())
 async def command_start_handler(message: Message, state = FSMContext) -> None:
@@ -74,6 +83,8 @@ async def command_start_handler(message: Message, state = FSMContext) -> None:
     await lang_sel_handler(message, state)  
    
      
+
+
  
 @form_router.message(ClientState.START_MESS)
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
@@ -87,23 +98,27 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
         keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
         
 
-        await message.answer(
+        msg = await message.answer(
              config.LANG_RU["Select_Lang_err"] + "\n\n" +
              config.LANG_EN["Select_Lang_err"] + "\n\n" +
              config.LANG_UZ["Select_Lang_err"] + "\n\n" 
              , reply_markup=keyboard
         )
          
+        
+        
+        await AddMessToRemove(msg)
         await state.set_state(ClientState.LANG_SELECTION)
 
 
 
 @form_router.message(ClientState.LANG_SELECTION)
 async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
-        #await  message.delete()
+        
         if message.text != "🇬🇧 English" and message.text != "🇺🇿 Uzbek" and message.text != "🇷🇺 Russian":
          
-          await message.delete()
+          await AddMessToRemove(message)
+          await RemoveMessages()
           await lang_sel_handler(message, state ) 
           return
         
@@ -131,7 +146,8 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     Option_language_str = await Translate_Message("Option_language", state)
     Option_select_message_str = await Translate_Message("Option_select_message", state)
     
-   
+
+
 
     if message.text == Option_location_str:   
        await location_handler(message, state) 
@@ -166,9 +182,12 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     #current_state = await state.get_state()
 
     #if not current_state is ClientState.MAIN_MENU:
-    tt = await message.answer(Option_select_message_str, reply_markup=keyboard)
-    await message.delete()
-    #await tt.delete()
+    await message.answer(Option_select_message_str, reply_markup=keyboard)
+    
+  
+    await AddMessToRemove(message)
+    await RemoveMessages()
+    
     await state.set_state(ClientState.MAIN_MENU) 
     
 
@@ -205,6 +224,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
     if message.text == cancel_str:
        await state.set_state(ClientState.MAIN_MENU) 
+       await RemoveMessages()
        await main_menu_handler(message, state) 
        return
 
@@ -216,14 +236,25 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     ]
 
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
-    await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    await AddMessToRemove(msg)
+    
     
     await state.set_state(ClientState.PERS_CAB_AUTH)
-    await message.delete()
- 
+    await AddMessToRemove(message)
+     
    
    
 
+
+ 
+# @form_router.message() 
+# async def restart_handler(message: Message, state = FSMContext) -> None:
+
+#     current_state = await state.get_state()
+#     logging.info(current_state)
+#     if current_state == None:
+#       await  command_start_handler(message, state) 
  
 
 
@@ -251,7 +282,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
 
     
     dp.include_router(form_router)
