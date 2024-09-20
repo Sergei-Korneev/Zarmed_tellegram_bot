@@ -79,7 +79,12 @@ async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
 
 async def RemoveMessages():
     for i in messages_del:
-      await bot.delete_message(chat_id=i[0],message_id=i[1])
+      try:
+          await bot.delete_message(chat_id=i[0],message_id=i[1])
+      except:
+          logging.error("Unable to delete message: "  + str(i[0]) + " - " + str(i[1]) )
+          pass 
+
     messages_del.clear()
 
 async def AddMessToRemove(message: Message = None):
