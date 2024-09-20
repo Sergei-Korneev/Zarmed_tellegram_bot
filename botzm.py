@@ -13,6 +13,19 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.methods.delete_message import DeleteMessage
 
+# from aiogram.fsm.storage.redis import RedisStorage
+
+# storage = RedisStorage(
+#     host=REDIS_HOST, 
+#     port=REDIS_PORT,
+#     db=REDIS_DB,
+#     password=REDIS_PASSWORD,
+#     # и т.д.
+# )
+
+# dp = Dispatcher(bot, storage=storage)
+
+
 
 # Bot token can be obtained via https://t.me/BotFather
 #TOKEN = config.TELEGRAM_BOT_TOKEN
@@ -52,7 +65,7 @@ async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
 
 async def RemoveMessages():
     for i in messages_del:
-     await bot.delete_message(chat_id=i[0],message_id=i[1])
+      await bot.delete_message(chat_id=i[0],message_id=i[1])
     messages_del.clear()
 
 async def AddMessToRemove(message: Message = None):
@@ -70,7 +83,7 @@ async def command_start_handler(message: Message, state = FSMContext) -> None:
     # method automatically or call API method directly via
     # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
  
-    
+    logging.info("The user with name '" + message.from_user.full_name + "' has started the bot.")
 
     msg = \
     config.LANG_RU["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU["Hello_mess"] + '\n\n' + \
@@ -159,13 +172,11 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
        #await state.set_state(ClientState.START_MESS)
        await state.set_state(ClientState.LANG_SELECTION) 
        await after_lang_sel_handler(message, state)   
-       #await message.delete()
        return
  
     if message.text == Option_cabinet_str:
        #await state.clear()
        await state.set_state(ClientState.PERS_CAB_AUTH)
-       #await message.delete()
        await pers_cab_auth_handler(message, state) 
        return
 
@@ -259,4 +270,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main())
+    asyncio.run(main()) 
