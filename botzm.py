@@ -268,7 +268,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-    msg1 = await message.answer_photo(photo=FSInputFile("res/qr_.png"))
+    msg1 = await message.answer_photo(photo=FSInputFile("./res/qr_.png"))
     await AddMessToRemove(msg)
     await AddMessToRemove(msg1)
     
