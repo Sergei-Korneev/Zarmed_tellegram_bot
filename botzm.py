@@ -31,9 +31,10 @@ from aiogram.types import FSInputFile
 # -------------------------------------------------------
 
 # ------------------- Postgres storage ---------------------
-# from AiogramStorages.storages import PGStorage
+from AiogramStorages.storages import PGStorage
 
-# storage = PGStorage(username='postgres', password='YourPassword', db_name='YourDbName')  
+PG_PASS = getenv("PG_PASS")
+storage = PGStorage(username='postgres', password=PG_PASS, db_name='zarmedbot_db')  
 # dp = Dispatcher(bot, storage=storage)
 # ------------------------------------------------------------
 
@@ -42,6 +43,7 @@ from aiogram.types import FSInputFile
 # Bot token can be obtained via https://t.me/BotFather
 #TOKEN = config.TELEGRAM_BOT_TOKEN
 TOKEN = getenv("BOT_TOKEN")
+
  
 
 # All handlers should be attached to the Router (or Dispatcher)
@@ -189,7 +191,6 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
     if message.text == Option_language_str:
        await state.clear()
-       #await state.set_state(ClientState.START_MESS)
        await state.set_state(ClientState.LANG_SELECTION) 
        await after_lang_sel_handler(message, state)   
        return
