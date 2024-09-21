@@ -32,7 +32,7 @@ from aiogram.methods.delete_message import DeleteMessage
 # ------------------- Postgres storage ---------------------
 # from AiogramStorages.storages import PGStorage
 
-# storage = PGStorage(username='YourUser', password='YourPassword', db_name='YourDbName')  
+# storage = PGStorage(username='postgres', password='YourPassword', db_name='YourDbName')  
 # dp = Dispatcher(bot, storage=storage)
 # ------------------------------------------------------------
 
@@ -179,7 +179,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     Option_select_message_str = await Translate_Message("Option_select_message", state)
     
 
-
+    await RemoveMessages()
 
     if message.text == Option_location_str:   
        await location_handler(message, state) 
@@ -212,13 +212,14 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     #current_state = await state.get_state()
 
     #if not current_state is ClientState.MAIN_MENU:
-    await message.answer(Option_select_message_str, reply_markup=keyboard)
+    msg = await message.answer(Option_select_message_str, reply_markup=keyboard)
     
   
     await AddMessToRemove(message)
     await RemoveMessages()
     
     await state.set_state(ClientState.MAIN_MENU) 
+    await AddMessToRemove(msg)
     
 
 
