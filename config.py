@@ -1,7 +1,7 @@
  
 LANG_RU =  {
   "Hello": "Здравствуйте,",
-  "Hello_mess": " вас приветствует бот клиники Zarmed!",
+  "Hello_mess": " \nВас приветствует бот клиники Zarmed!",
   "Select_Lang_err": "Пожалуйста, выберите язык!",
   "Option_location": "📞 Контакты и локации",
   "Option_cabinet": "👤 Персональный кабинет",
@@ -19,7 +19,7 @@ LANG_RU =  {
 
 LANG_EN =  {
   "Hello": "Hello,",
-  "Hello_mess": " Zarmed clinic bot welcomes you!",
+  "Hello_mess": " \nZarmed clinic bot welcomes you!",
   "Select_Lang_err": "Please, select your language!",
   "Option_location": "📞 Contacts and locations",
   "Option_cabinet": "👤 Personalized User Area",
@@ -37,7 +37,7 @@ LANG_EN =  {
 
 LANG_UZ =  {
   "Hello": "Здравствуйте,",
-  "Hello_mess": " вас приветствует бот клиники Zarmed!",
+  "Hello_mess": " \nВас приветствует бот клиники Zarmed!",
   "Select_Lang_err": "Пожалуйста, выберите язык!",
   "Option_location": "📞 Контакты и локации",
   "Option_cabinet": "👤 Персональный кабинет",
