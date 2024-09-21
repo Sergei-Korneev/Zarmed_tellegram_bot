@@ -179,12 +179,12 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     Option_select_message_str = await Translate_Message("Option_select_message", state)
     
 
-    await RemoveMessages()
+  
 
     if message.text == Option_location_str:   
        await location_handler(message, state) 
        await message.delete()
-       #return
+       return
     
     if message.text == Option_language_str:
        await state.clear()
@@ -192,13 +192,13 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
        await state.set_state(ClientState.LANG_SELECTION) 
        await after_lang_sel_handler(message, state)   
        return
- 
+    
     if message.text == Option_cabinet_str:
        #await state.clear()
        await state.set_state(ClientState.PERS_CAB_AUTH)
        await pers_cab_auth_handler(message, state) 
        return
-
+    await RemoveMessages()
     kb = [
         [KeyboardButton(text=Option_location_str)],
         [KeyboardButton(text=Option_cabinet_str)],
