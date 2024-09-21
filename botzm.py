@@ -184,7 +184,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     if message.text == Option_location_str:   
        await location_handler(message, state) 
        await message.delete()
-       return
+       #return
     
     if message.text == Option_language_str:
        await state.clear()
