@@ -12,6 +12,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,  ReplyKeyboardRem
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.methods.delete_message import DeleteMessage
+from aiogram.types import FSInputFile
 
 
 
@@ -267,7 +268,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-    msg1 = await message.answer_photo("./res/qr_.png")
+    cat = FSInputFile("./res/qr_.png")
+    msg1 = await message.answer_photo(cat)
     await AddMessToRemove(msg)
     await AddMessToRemove(msg1)
     
