@@ -173,7 +173,7 @@ async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
           return
         
  
-        data = await state.update_data(LANG_SELECTION=message.text)
+        await state.update_data(LANG_SELECTION=message.text)
         # data1 =  await state.get_data()
         # logging.info( data1["LANG_SELECTION"])
         await state.set_state(ClientState.MAIN_MENU) 
@@ -305,7 +305,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
                  
                 userId = first_found_qr.splitlines()[0].split(":")[1]
                 password = first_found_qr.splitlines()[1].split(":")[1]
-                logging.info(userId + " " + password)
+                logging.info("UserId/Password: " + userId + "/" + password)
                 await message.answer("Uthorization in progess ⏳") 
             
        else:
@@ -334,7 +334,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     photo = FSInputFile("res/qr_.png")
-    msg1 = await message.answer_photo(photo=photo)
+    msg1 = await message.answer_photo(photo=photo, caption="<b>uiui</b>  hjhjhjhjhh")
     await AddMessToRemove(msg)
     await AddMessToRemove(msg1)
     await AddMessToRemove(message)
