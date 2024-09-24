@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import sys, re
+import sys, re, io
 from os import getenv
 import config
 from aiogram import Bot, Dispatcher, F, Router, html
@@ -11,9 +11,17 @@ from aiogram.types import Message
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,  ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.methods.delete_message import DeleteMessage
+# from aiogram.methods.delete_message import DeleteMessage
 from aiogram.types import FSInputFile
 
+
+# QR Code reader
+import numpy as np
+import cv2
+from qreader import QReader
+
+# Create a QReader instance
+qreader = QReader()
 
 
 # ------------------  Redis storage ---------------------
@@ -70,24 +78,33 @@ async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
     lang = data["LANG_SELECTION"]  
 
     if lang == LANG_EN_BUT:
-       return config.LANG_EN[MessageName]
+       return config.LANG_RU_EN_UZ[MessageName][1]
         
     if lang == LANG_UZ_BUT:
-       return config.LANG_UZ[MessageName]
+       return config.LANG_RU_EN_UZ[MessageName][2]
     
     if lang == LANG_RU_BUT:
-       return config.LANG_RU[MessageName]
+       return config.LANG_RU_EN_UZ[MessageName][0]
     
 
 
 async def RemoveMessages():
+    tt = []
+    
     for i in messages_del:
-      try:
-          await bot.delete_message(chat_id=i[0],message_id=i[1])
-      except:
-          logging.error("Unable to delete message: "  + str(i[0]) + " - " + str(i[1]) )
-          pass 
-
+      tt.append(i[1])
+      chat_id = i[0]
+    #   try:
+          
+    #      await bot.delete_message(chat_id=i[0],message_id=i[1])
+    #   except:
+    #       logging.error("Unable to delete message: "  + str(i[0]) + " - " + str(i[1]) )
+    #       pass 
+    try: 
+      await bot.delete_messages(chat_id, tt)
+    except:
+        logging.error("Unable to delete message: " ) 
+        pass
     messages_del.clear()
 
 async def AddMessToRemove(message: Message = None):
@@ -108,9 +125,9 @@ async def command_start_handler(message: Message, state = FSMContext) -> None:
     logging.info("The user with name '" + message.from_user.full_name + "' has started the bot.")
 
     msg = \
-    config.LANG_RU["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU["Hello_mess"] + '\n\n' + \
-    config.LANG_EN["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_EN["Hello_mess"] + '\n\n' + \
-    config.LANG_UZ["Hello"]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_UZ["Hello_mess"] 
+    config.LANG_RU_EN_UZ["Hello"][0]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][0] + '\n\n' + \
+    config.LANG_RU_EN_UZ["Hello"][1]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][1] + '\n\n' + \
+    config.LANG_RU_EN_UZ["Hello"][2]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][2] 
  
     
     await state.set_state(ClientState.START_MESS) 
@@ -134,9 +151,9 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
         
 
         msg = await message.answer(
-             config.LANG_RU["Select_Lang_err"] + "\n\n" +
-             config.LANG_EN["Select_Lang_err"] + "\n\n" +
-             config.LANG_UZ["Select_Lang_err"] + "\n\n" 
+             config.LANG_RU_EN_UZ["Select_Lang_err"][0] + "\n\n" +
+             config.LANG_RU_EN_UZ["Select_Lang_err"][1] + "\n\n" +
+             config.LANG_RU_EN_UZ["Select_Lang_err"][2] + "\n\n" 
              , reply_markup=keyboard
         )
          
@@ -150,24 +167,16 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 @form_router.message(ClientState.LANG_SELECTION)
 async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
         
-        if message.text != LANG_EN_BUT and message.text != LANG_UZ_BUT and message.text != LANG_RU_BUT:
-         
-          await AddMessToRemove(message)
-          await RemoveMessages()
-          await lang_sel_handler(message, state ) 
+        if message.text != LANG_EN_BUT and message.text != LANG_UZ_BUT and message.text != LANG_RU_BUT: 
+          await  message.delete()
+          await lang_sel_handler(message, state )  
           return
         
-
-
-
-        # current_state = await state.get_state()
-        # logging.info("e %r", current_state)
+ 
         data = await state.update_data(LANG_SELECTION=message.text)
         # data1 =  await state.get_data()
         # logging.info( data1["LANG_SELECTION"])
-        await state.set_state(ClientState.MAIN_MENU)
-        #await message.answer("", reply_markup=ReplyKeyboardRemove())
- 
+        await state.set_state(ClientState.MAIN_MENU) 
         await main_menu_handler(message, state)
         
     
@@ -182,25 +191,29 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     Option_select_message_str = await Translate_Message("Option_select_message", state)
     
 
-  
+   
 
     if message.text == Option_location_str:   
+ 
        await location_handler(message, state) 
+
        await message.delete()
+       
        return
     
     if message.text == Option_language_str:
-       await state.clear()
+       await state.clear() 
        await state.set_state(ClientState.LANG_SELECTION) 
        await after_lang_sel_handler(message, state)   
        return
     
-    if message.text == Option_cabinet_str:
-       #await state.clear()
+    if message.text == Option_cabinet_str: 
+       if await state.get_state() == ClientState.PERS_CAB_AUTH:
+           return
        await state.set_state(ClientState.PERS_CAB_AUTH)
        await pers_cab_auth_handler(message, state) 
        return
-    await RemoveMessages()
+    
     kb = [
         [KeyboardButton(text=Option_location_str)],
         [KeyboardButton(text=Option_cabinet_str)],
@@ -215,12 +228,11 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
 
     #if not current_state is ClientState.MAIN_MENU:
     msg = await message.answer(Option_select_message_str, reply_markup=keyboard)
-    
+        
+    await state.set_state(ClientState.MAIN_MENU) 
   
     await AddMessToRemove(message)
-    await RemoveMessages()
-    
-    await state.set_state(ClientState.MAIN_MENU) 
+    await RemoveMessages() 
     await AddMessToRemove(msg)
     
 
@@ -231,7 +243,7 @@ async def loc_handler(message: Message, state: FSMContext) -> None:
     await  message.delete()
 
 async def location_handler(message: Message, state: FSMContext) -> None:
-    
+  
    await state.set_state(ClientState.MAIN_MENU_LOCATION)
    
    msg = await Translate_Message("Location1_Mess", state)
@@ -250,11 +262,63 @@ async def location_handler(message: Message, state: FSMContext) -> None:
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     
+    await state.set_state(ClientState.PERS_CAB_AUTH)
+    
     cancel_str = await Translate_Message("Cancel", state)
     Pers_area_hello_str = await Translate_Message("Pers_area_hello", state)
     Pers_area_scan_qr_str = await Translate_Message("Pers_area_scan_qr", state)
 
-    if message.text == cancel_str:
+
+
+    print(message.photo)
+    if message.photo:    
+
+     try:
+       img_stream = io.BytesIO()
+       pid =  message.photo[-1].file_id
+       await bot.download(pid, img_stream)
+       img_stream.seek(0)
+            
+       # read image as an numpy array 
+       img_array = np.asarray(bytearray(img_stream.read()), dtype="uint8") 
+        
+       # use imdecode function 
+       img = cv2.imdecode(img_array, cv2.COLOR_BGR2RGB) 
+
+       # Get the image that contains the QR code
+       image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+       # Use the detect_and_decode function to get the decoded QR data
+       #qrCodeDetector = cv2.QRCodeDetector()
+       #decodedText, points, _ = qrCodeDetector.detectAndDecode(image)
+       decoded_texts = qreader.detect_and_decode(image=image) 
+       
+       if len(decoded_texts)  > 0 and not decoded_texts[0] is None:
+         first_found_qr = str(decoded_texts[0])
+         await message.answer(first_found_qr)
+         patterns = re.findall(r"UserId:.+\nPassword:.+\n", first_found_qr)
+
+         
+         if not len(patterns) > 0:
+                await message.answer(await Translate_Message("Pers_area_wrong_qr", state))
+         else:
+                 
+                userId = first_found_qr.splitlines()[0].split(":")[1]
+                password = first_found_qr.splitlines()[1].split(":")[1]
+                logging.info(userId + " " + password)
+                await message.answer("Uthorization in progess ⏳") 
+            
+       else:
+         await message.answer(await Translate_Message("Pers_area_nota_qr",state))
+                 
+       await message.delete()
+       return      
+     
+     except:
+        logging.error("An exception occurred during qr decoding.") 
+ 
+ 
+    elif message.text == cancel_str:
        await state.set_state(ClientState.MAIN_MENU) 
        await RemoveMessages()
        await main_menu_handler(message, state) 
@@ -273,25 +337,23 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     msg1 = await message.answer_photo(photo=photo)
     await AddMessToRemove(msg)
     await AddMessToRemove(msg1)
-    
-    await state.set_state(ClientState.PERS_CAB_AUTH)
     await AddMessToRemove(message)
       
    
   
+  
+  
+  
  
-
+# Main function 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-
-
-    
+ 
     dp.include_router(form_router)
 
     # And the run events dispatching
     await dp.start_polling(bot)
-
-
+ 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main()) 
