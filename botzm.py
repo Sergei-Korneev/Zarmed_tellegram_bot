@@ -58,10 +58,10 @@ TOKEN = getenv("BOT_TOKEN")
 form_router = Router()
 dp = Dispatcher()
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
 messages_del = []
-LANG_EN_BUT = "🇬🇧 English"
-LANG_UZ_BUT = "🇺🇿 Uzbek"
-LANG_RU_BUT = "🇷🇺 Russian"
+
+
 
 
 class ClientState(StatesGroup):
@@ -74,18 +74,23 @@ class ClientState(StatesGroup):
  
 
 async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
-    data =  await state.get_data() 
-    lang = data["LANG_SELECTION"]  
 
-    if lang == LANG_EN_BUT:
-       return config.LANG_RU_EN_UZ[MessageName][1]
+    try:
+        data =  await state.get_data() 
+        lang = data["LANG_SELECTION"]  
         
-    if lang == LANG_UZ_BUT:
-       return config.LANG_RU_EN_UZ[MessageName][2]
-    
-    if lang == LANG_RU_BUT:
-       return config.LANG_RU_EN_UZ[MessageName][0]
-    
+        if lang == config.LANG_EN_BUT:
+         return config.LANG_RU_EN_UZ[MessageName][1]
+            
+        if lang == config.LANG_UZ_BUT:
+         return config.LANG_RU_EN_UZ[MessageName][2]
+        
+        if lang == config.LANG_RU_BUT:
+         return config.LANG_RU_EN_UZ[MessageName][0]
+     
+    except:
+        logging.error("Unable to translate the message: " + MessageName)
+        return "Message translation error."    
 
 
 async def RemoveMessages():
@@ -142,11 +147,11 @@ async def command_start_handler(message: Message, state = FSMContext) -> None:
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
         
         kb = [
-        
-        [KeyboardButton(text=LANG_UZ_BUT)],
-        [KeyboardButton(text=LANG_RU_BUT)],
-        [KeyboardButton(text=LANG_EN_BUT)]         
+        [KeyboardButton(text=config.LANG_UZ_BUT)],
+        [KeyboardButton(text=config.LANG_RU_BUT)],
+        [KeyboardButton(text=config.LANG_EN_BUT)]         
         ]
+        
         keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
         
 
@@ -167,7 +172,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 @form_router.message(ClientState.LANG_SELECTION)
 async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
         
-        if message.text != LANG_EN_BUT and message.text != LANG_UZ_BUT and message.text != LANG_RU_BUT: 
+        if message.text != config.LANG_EN_BUT and message.text != config.LANG_UZ_BUT and message.text != config.LANG_RU_BUT: 
           await  message.delete()
           await lang_sel_handler(message, state )  
           return
@@ -188,17 +193,11 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     Option_location_str = await Translate_Message("Option_location", state)
     Option_cabinet_str =  await Translate_Message("Option_cabinet", state)
     Option_language_str = await Translate_Message("Option_language", state)
-    Option_select_message_str = await Translate_Message("Option_select_message", state)
-    
+  
 
-   
-
-    if message.text == Option_location_str:   
- 
-       await location_handler(message, state) 
-
+    if message.text == Option_location_str: 
+       await location_handler(message, state)  
        await message.delete()
-       
        return
     
     if message.text == Option_language_str:
@@ -227,8 +226,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     #current_state = await state.get_state()
 
     #if not current_state is ClientState.MAIN_MENU:
-    msg = await message.answer(Option_select_message_str, reply_markup=keyboard)
-        
+    msg = await message.answer(await Translate_Message("Option_select_message", state), reply_markup=keyboard) 
     await state.set_state(ClientState.MAIN_MENU) 
   
     await AddMessToRemove(message)
@@ -244,14 +242,10 @@ async def loc_handler(message: Message, state: FSMContext) -> None:
 
 async def location_handler(message: Message, state: FSMContext) -> None:
   
-   await state.set_state(ClientState.MAIN_MENU_LOCATION)
-   
-   msg = await Translate_Message("Location1_Mess", state)
+   await state.set_state(ClientState.MAIN_MENU_LOCATION) 
    location = await Translate_Message("Location1", state) 
-
-   msg1 = await message.answer(msg, parse_mode=ParseMode.HTML)
-   #await msg1.reply_location(location[0], location[1])
    await message.answer_location(location[0], location[1])
+   await message.answer(await Translate_Message("Location1_Mess", state), parse_mode=ParseMode.HTML)
    await state.set_state(ClientState.MAIN_MENU)
  
    
@@ -295,7 +289,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
        
        if len(decoded_texts)  > 0 and not decoded_texts[0] is None:
          first_found_qr = str(decoded_texts[0])
-         await message.answer(first_found_qr)
+          
          patterns = re.findall(r"UserId:.+\nPassword:.+\n", first_found_qr)
 
          
@@ -306,7 +300,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
                 userId = first_found_qr.splitlines()[0].split(":")[1]
                 password = first_found_qr.splitlines()[1].split(":")[1]
                 logging.info("UserId/Password: " + userId + "/" + password)
-                await message.answer("Uthorization in progess ⏳") 
+                await message.answer(await  Translate_Message("Pers_area_auth_inprogress", state)) 
             
        else:
          await message.answer(await Translate_Message("Pers_area_nota_qr",state))
