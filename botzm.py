@@ -3,17 +3,18 @@ import logging
 import sys, re, io
 from os import getenv
 import config
+import http1c
 from aiogram import Bot, Dispatcher, F, Router, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,  ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton,  ReplyKeyboardRemove, InlineKeyboardMarkup , InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+from aiogram.types.input_file import FSInputFile
 # from aiogram.methods.delete_message import DeleteMessage
-from aiogram.types import FSInputFile
-
+ 
 
 # QR Code reader
 import numpy as np
@@ -54,6 +55,9 @@ TOKEN = getenv("BOT_TOKEN")
 
  
 
+ONEC_USER = getenv("ONEC_USER")
+ONEC_PASS = getenv("ONEC_PASS")
+
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
@@ -70,10 +74,11 @@ class ClientState(StatesGroup):
     MAIN_MENU = State()
     MAIN_MENU_LOCATION = State()
     PERS_CAB_AUTH = State()
+    PERS_CAB_AUTH_BEGIN = State()
  
  
 
-async def  Translate_Message(MessageName: str, state: FSMContext) -> any:
+async def  TranslateMessage(MessageName: str, state: FSMContext) -> any:
 
     try:
         data =  await state.get_data() 
@@ -190,29 +195,31 @@ async def after_lang_sel_handler(message: Message, state: FSMContext) -> None:
 @form_router.message(ClientState.MAIN_MENU)
 async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
-    Option_location_str = await Translate_Message("Option_location", state)
-    Option_cabinet_str =  await Translate_Message("Option_cabinet", state)
-    Option_language_str = await Translate_Message("Option_language", state)
-  
+
+    
+    Option_location_str = await TranslateMessage("Option_location", state)
+    Option_cabinet_str =  await TranslateMessage("Option_cabinet", state)
+    Option_language_str = await TranslateMessage("Option_language", state)
+ 
 
     if message.text == Option_location_str: 
        await location_handler(message, state)  
        await message.delete()
        return
     
-    if message.text == Option_language_str:
+    elif message.text == Option_language_str:
        await state.clear() 
        await state.set_state(ClientState.LANG_SELECTION) 
        await after_lang_sel_handler(message, state)   
        return
     
-    if message.text == Option_cabinet_str: 
-       if await state.get_state() == ClientState.PERS_CAB_AUTH:
-           return
-       await state.set_state(ClientState.PERS_CAB_AUTH)
-       await pers_cab_auth_handler(message, state) 
+    elif message.text == Option_cabinet_str: 
+       await state.set_state(ClientState.PERS_CAB_AUTH_BEGIN) 
+       await pers_cab_auth_begin_handler(message, state) 
+       await message.delete()
        return
     
+   
     kb = [
         [KeyboardButton(text=Option_location_str)],
         [KeyboardButton(text=Option_cabinet_str)],
@@ -226,7 +233,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     #current_state = await state.get_state()
 
     #if not current_state is ClientState.MAIN_MENU:
-    msg = await message.answer(await Translate_Message("Option_select_message", state), reply_markup=keyboard) 
+    msg = await message.answer(await TranslateMessage("Option_select_message", state), reply_markup=keyboard) 
     await state.set_state(ClientState.MAIN_MENU) 
   
     await AddMessToRemove(message)
@@ -234,7 +241,22 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     await AddMessToRemove(msg)
     
 
-
+@form_router.callback_query()
+async  def call_handler(message: CallbackQuery):
+    logging.info(message)
+    #await message.answer(text=message.data, cache_time=30)#,show_alert=True)
+    
+    inline_btn_1 = InlineKeyboardButton(text='Щелочная фосфатаза', callback_data='button1')
+    
+    inline_btn_2 = InlineKeyboardButton(text='Узи сердца (ЭХО-КГ)', callback_data='button2')
+    inline_btn_3 = InlineKeyboardButton(text='Анализ мазка из влагалища', callback_data='button3')
+    inline_btn_4 = InlineKeyboardButton(text='Осмотр (Невропатолога)', callback_data='button4')
+    
+    inline_kb1 = InlineKeyboardMarkup(inline_keyboard=[[inline_btn_1,inline_btn_2],[inline_btn_3,inline_btn_4 ]])
+  
+   # await message.answer("Выьерите дату посещения: ", reply_markup=inline_kb1)
+    
+    await bot.send_message(message.message.chat.id, "Ваши приемы за дату 08/09/2024", reply_markup=inline_kb1)
 
 @form_router.message(ClientState.MAIN_MENU_LOCATION)
 async def loc_handler(message: Message, state: FSMContext) -> None:
@@ -243,28 +265,52 @@ async def loc_handler(message: Message, state: FSMContext) -> None:
 async def location_handler(message: Message, state: FSMContext) -> None:
   
    await state.set_state(ClientState.MAIN_MENU_LOCATION) 
-   location = await Translate_Message("Location1", state) 
+   location = await TranslateMessage("Location1", state) 
    await message.answer_location(location[0], location[1])
-   await message.answer(await Translate_Message("Location1_Mess", state), parse_mode=ParseMode.HTML)
+   await message.answer(await TranslateMessage("Location1_Mess", state), parse_mode=ParseMode.HTML)
    await state.set_state(ClientState.MAIN_MENU)
  
    
-   
+@form_router.message(ClientState.PERS_CAB_AUTH_BEGIN)
+
+async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> None:
+    
+
+    
+    curent_st =  await state.get_state()
+    if curent_st == ClientState.PERS_CAB_AUTH:
+        await message.delete()
+        return
+    
+    
+    Pers_area_hello_str = await TranslateMessage("Pers_area_hello", state)
+    Pers_area_scan_qr_str = await TranslateMessage("Pers_area_scan_qr", state)
+    cancel_str = await TranslateMessage("Cancel", state)
+
+    kb = [
+        
+ 
+        [KeyboardButton(text=cancel_str)]       
+    ]
+
+    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    photo = FSInputFile("res/qr_.png")
+    msg1 = await message.answer_photo(photo=photo, caption="<b>Фото qr</b>  Сфотографируйте и отправьте фото вашей квитанции")
+    await AddMessToRemove(msg)
+    await AddMessToRemove(msg1)
+    await AddMessToRemove(message)
+    await state.set_state(ClientState.PERS_CAB_AUTH)
+ 
  
 @form_router.message(ClientState.PERS_CAB_AUTH)
- 
+
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
-    
-    await state.set_state(ClientState.PERS_CAB_AUTH)
-    
-    cancel_str = await Translate_Message("Cancel", state)
-    Pers_area_hello_str = await Translate_Message("Pers_area_hello", state)
-    Pers_area_scan_qr_str = await Translate_Message("Pers_area_scan_qr", state)
+ 
+    cancel_str = await TranslateMessage("Cancel", state)
 
-
-
-    print(message.photo)
+ 
     if message.photo:    
 
      try:
@@ -289,50 +335,62 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
        
        if len(decoded_texts)  > 0 and not decoded_texts[0] is None:
          first_found_qr = str(decoded_texts[0])
-          
+         await message.answer(first_found_qr)
          patterns = re.findall(r"UserId:.+\nPassword:.+\n", first_found_qr)
-
+        
          
          if not len(patterns) > 0:
-                await message.answer(await Translate_Message("Pers_area_wrong_qr", state))
+                await message.answer(await TranslateMessage("Pers_area_wrong_qr", state))
          else:
                  
                 userId = first_found_qr.splitlines()[0].split(":")[1]
                 password = first_found_qr.splitlines()[1].split(":")[1]
                 logging.info("UserId/Password: " + userId + "/" + password)
-                await message.answer(await  Translate_Message("Pers_area_auth_inprogress", state)) 
+                await message.answer(await  TranslateMessage("Pers_area_auth_inprogress", state)) 
+
+                
+                   
+                inline_btn_1 = InlineKeyboardButton(text='08/09/2024', callback_data='button1')
+                
+                inline_btn_2 = InlineKeyboardButton(text='11/09/2024', callback_data='button2')
+                inline_btn_3 = InlineKeyboardButton(text='25/09/2024', callback_data='button3')
+                inline_btn_4 = InlineKeyboardButton(text='26/09/2024', callback_data='button4')
+                
+                inline_kb1 = InlineKeyboardMarkup(inline_keyboard=[[inline_btn_1,inline_btn_2],[inline_btn_3,inline_btn_4 ]])
+            
+                await message.answer("Выберите дату посещения: ", reply_markup=inline_kb1)
+    
+
+         
+
             
        else:
-         await message.answer(await Translate_Message("Pers_area_nota_qr",state))
+         await message.answer(await TranslateMessage("Pers_area_nota_qr",state))
                  
        await message.delete()
        return      
      
      except:
         logging.error("An exception occurred during qr decoding.") 
- 
+   
+   
+   
+   
+   
+          
+
  
     elif message.text == cancel_str:
        await state.set_state(ClientState.MAIN_MENU) 
        await RemoveMessages()
        await main_menu_handler(message, state) 
        return
-
- 
-    kb = [
+    else:
+       
+       await message.delete()
         
-        [KeyboardButton(text=Pers_area_scan_qr_str)],
-        [KeyboardButton(text=cancel_str)]       
-    ]
 
-    keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
-    msg = await message.answer(Pers_area_hello_str, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-    photo = FSInputFile("res/qr_.png")
-    msg1 = await message.answer_photo(photo=photo, caption="<b>uiui</b>  hjhjhjhjhh")
-    await AddMessToRemove(msg)
-    await AddMessToRemove(msg1)
-    await AddMessToRemove(message)
-      
+   
    
   
   

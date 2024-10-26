@@ -1,3 +1,11 @@
+
+
+# 1C Settings
+HTTP_TIMEOUT = 10
+ONEC_IP = '192.168.122.133'
+ONEC_DB = 'zarmed'
+
+# BOT Settings
 LANG_EN_BUT = "🇬🇧 English"
 LANG_UZ_BUT = "🇺🇿 Uzbek"
 LANG_RU_BUT = "🇷🇺 Russian" 
@@ -60,11 +68,10 @@ LANG_RU_EN_UZ =  {
                         "QR не обнаружен."],
   
   "Pers_area_auth_inprogress": ["Попытка авторизации... ⏳",
-                        "Trying to authorize... ⏳",
-                        "Попытка авторизации... ⏳"],
+                                "Trying to authorize... ⏳",
+                                "Попытка авторизации... ⏳"],
   
-  
-  
+
   "Cancel": ["❌ Отмена",
              "❌ Cancel",
              "❌ Отмена"],
