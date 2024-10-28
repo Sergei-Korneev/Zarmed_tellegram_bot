@@ -395,7 +395,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     
     await RemoveMessages()
     
-    ldays = result[1][0]
+    #ldays = result[1][0]
     
     buttons = []
         
@@ -503,7 +503,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
         
         
-        print(result)
+        # print(result)
         if result[0] == 200:
             media_group = list()
             # await bot.send_message(chatid, await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0]))
