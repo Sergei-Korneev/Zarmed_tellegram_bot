@@ -1,5 +1,6 @@
 import sys, re, io, base64, logging, asyncio, config, http1c
 from os import getenv
+from aiogram.utils.backoff import Backoff, BackoffConfig
 from aiogram import Bot, Dispatcher, F, Router, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -317,9 +318,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     if allargs != "":
            userId = allargs[0:8]
            password = allargs[8:16]
-    
-    
-           print (userId +" "+ password)
+  
     
     elif message.photo:    
 
@@ -355,8 +354,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
                 first_found_qr  = first_found_qr.split("?start=")[1]  
                 userId = first_found_qr[0:8]
                 password = first_found_qr[8:16]
-                await message.answer("UserId/Password: " + userId + "/" + password)
- 
+                 
        else:
          await message.answer(await TranslateMessage("Pers_area_nota_qr",state))
          return
@@ -444,7 +442,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
  
     
     if await state.get_state() == None:
-       print(message.message)
+        
        await command_start_handler(message.message, None, state) 
        return
     
@@ -528,7 +526,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         
-  
+       
      
         
         
@@ -554,9 +552,12 @@ async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
  
     dp.include_router(form_router)
-
+    
+    bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
+    
+    
     # And the run events dispatching
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, polling_timeout=15 , backoff_config=bk)
     
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
