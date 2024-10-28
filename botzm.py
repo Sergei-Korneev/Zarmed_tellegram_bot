@@ -3,7 +3,7 @@ from os import getenv
 from aiogram import Bot, Dispatcher, F, Router, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandStart , StateFilter
+from aiogram.filters import Command, CommandStart , StateFilter, CommandObject
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InputMediaDocument, ReplyKeyboardRemove, InlineKeyboardMarkup , InlineKeyboardButton, Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -58,8 +58,7 @@ dp = Dispatcher()
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 messages_del = []
-
- 
+allargs = "" 
 
 # FSM Class
 class ClientState(StatesGroup):
@@ -124,10 +123,10 @@ def repl_forb(string):
 
 
 async def RemoveMessages():
-    tt = []
+    AllMsgs = []
     
     for i in messages_del:
-      tt.append(i[1])
+      AllMsgs.append(i[1])
       chat_id = i[0]
     #   try:
           
@@ -136,11 +135,14 @@ async def RemoveMessages():
     #       logging.error("Unable to delete message: "  + str(i[0]) + " - " + str(i[1]) )
     #       pass 
     try: 
-      await bot.delete_messages(chat_id, tt)
+      await bot.delete_messages(chat_id, AllMsgs)
     except:
         logging.error("Unable to delete message: " ) 
         pass
     messages_del.clear()
+
+
+
 
 async def AddMessToRemove(messages: list[Message]):
     for message in messages:
@@ -149,37 +151,28 @@ async def AddMessToRemove(messages: list[Message]):
  
  
  
- 
- 
- 
+  
  
  
 """
 This handler receives messages with `/start` command
 """
 
-@form_router.message(CommandStart(deep_link=True, ignore_case=True,deep_link_encoded=False))
-async def command_start_handler(message: Message, command: Command, state = FSMContext) -> None:
+@form_router.message(CommandStart(deep_link=True))
+async def command_start_handler(message: Message, command: CommandObject, state = FSMContext) -> None:
     
     await state.clear()
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
+ 
  
     if command != None:
-     args = command.args
-    else:
-     args = ""
-     
-    
-    
+        global allargs   
+        allargs = command.args
+ 
     #payload = decode_payload(args)
     #await message.answer(f"Your payload: {payload}")
 
  
-    logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + args)
+    logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + allargs)
  
     msgtxt = \
     config.LANG_RU_EN_UZ["Hello"][0]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][0] + '\n\n' + \
@@ -221,15 +214,16 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
                   config.LANG_RU_EN_UZ["Select_Lang_err"][1] + "\n" + \
                   config.LANG_RU_EN_UZ["Select_Lang_err"][2] + "\n" 
         
-    await message.answer(messtxt, reply_markup=inline_kb1)
+    msg = await message.answer(messtxt, reply_markup=inline_kb1)
     await state.set_state(ClientState.LANG_SELECTION)
+    await AddMessToRemove([msg])
     
             
 
 
  
 
-
+# Main menu handler
 @form_router.message(ClientState.MAIN_MENU)
 async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None:
     await CheckRestart(message, state)
@@ -237,7 +231,9 @@ async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None
 
 async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
-
+    global allargs
+    allargs = ''
+    await RemoveMessages()
     
     Option_location_str = await TranslateMessage("Option_location", state)
     Option_cabinet_str =  await TranslateMessage("Option_cabinet", state)
@@ -262,7 +258,6 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
 # Location handler
 @form_router.message(ClientState.MAIN_MENU_LOCATION)
 async def loc_handler(message: Message, state: FSMContext) -> None:
-    
     await  message.delete()
 
 async def location_handler(message: Message, state: FSMContext) -> None:
@@ -312,14 +307,21 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
 @form_router.message(ClientState.PERS_CAB_AUTH)
 
  
-async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
+async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) -> None:
     
  
     
     userId = ''
     password = ''
     
-    if message.photo:    
+    if allargs != "":
+           userId = allargs[0:8]
+           password = allargs[8:16]
+    
+    
+           print (userId +" "+ password)
+    
+    elif message.photo:    
 
      #try:
        img_stream = io.BytesIO()
@@ -344,25 +346,22 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
        if len(decoded_texts)  > 0 and not decoded_texts[0] is None:
          first_found_qr = str(decoded_texts[0])
         #  await message.answer(first_found_qr)
-         patterns = re.findall(r"start=[0-9]{8}:[0-9]{8}", first_found_qr)
+         patterns = re.findall(r"start=[0-9]{16}", first_found_qr)
         
          
          if len(patterns) == 0:
                 await message.answer(await TranslateMessage("Pers_area_wrong_qr", state))
          else:
                 first_found_qr  = first_found_qr.split("?start=")[1]  
-                userId = first_found_qr.split(":")[0]
-                password = first_found_qr.split(":")[1]
-                # await message.answer("UserId/Password: " + userId + "/" + password)
+                userId = first_found_qr[0:8]
+                password = first_found_qr[8:16]
+                await message.answer("UserId/Password: " + userId + "/" + password)
  
        else:
          await message.answer(await TranslateMessage("Pers_area_nota_qr",state))
          return
          
-                 
-    #    await message.delete()
-    #    return      
-     
+ 
      #except:
         #logging.error("An exception occurred during qr decoding.") 
     
@@ -376,8 +375,15 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
         await message.answer(await TranslateMessage("Pers_area_auth_wrong_input", state))
         return
         
-        
-        
+    buttons = []   
+    buttons.append([
+    InlineKeyboardButton(
+        text=await TranslateMessage("Cancel", state), 
+        callback_data=await TranslateMessage("Cancel", state)
+        )
+    ])
+    inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
+           
     
     msg1 = await message.answer(await  TranslateMessage("Pers_area_auth_inprogress", state)) 
 
@@ -387,18 +393,20 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
      
     if result[0] != 200:
         if result[0] == 401:
-          await message.answer(await TranslateMessage("Pers_area_auth_wrong_auth_data", state))
+          msg = await message.answer(await TranslateMessage("Pers_area_auth_wrong_auth_data", state),reply_markup=inline_kb1)
+          await  AddMessToRemove([msg])
           return
         else:
-          await message.answer(await TranslateMessage("General_err_un", state))
+          msg = await message.answer(await TranslateMessage("General_err_un", state), reply_markup=inline_kb1)
+          await AddMessToRemove([msg])
           return
     
     await RemoveMessages()
     
     #ldays = result[1][0]
     
-    buttons = []
-        
+    buttons = []   
+
     Appdates = result[1]["AppDates"]
                         
     for x in range(0, len(Appdates), 2):
@@ -410,28 +418,22 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
 
     
     buttons.append([
-        InlineKeyboardButton(
-            text=await TranslateMessage("Cancel", state), 
-            callback_data=await TranslateMessage("Cancel", state)
-            )
-        ])
+    InlineKeyboardButton(
+        text=await TranslateMessage("Cancel", state), 
+        callback_data=await TranslateMessage("Cancel", state)
+        )
+    ])
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
+           
         
 
     msg2 = await message.answer(await TranslateMessage("Pers_area_appointment_select_date_mes", state), reply_markup=inline_kb1)
     await AddMessToRemove([msg1,msg2])
 
     
-    
-  
-
-
-#result = DBRequest('appapi/getApp?userid=00001411&ucode=57084919')
-#result = http1c.DBRequest('appapi/getAppD?appdata=03.06.2024&userid=00001411&ucode=57084919')
+     
 #result = DBRequest('appapi/getSet')
- 
-
-
+  
 
 # Callback handler
 
@@ -481,32 +483,31 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         await state.update_data(LANG_SELECTION=message.data)
         # data1 =  await state.get_data()
         # logging.info( data1["LANG_SELECTION"])
+        if allargs != "":
+           await state.set_state(ClientState.PERS_CAB_AUTH) 
+           await pers_cab_auth_handler(message.message, state) 
+           return
         
-        await main_menu_handler(message.message, state)
- 
+        
         await state.set_state(ClientState.MAIN_MENU) 
-        await  message.message.delete()
+        await AddMessToRemove([message.message])
+        await main_menu_handler(message.message, state)
         return
     
     
     if await state.get_state() == ClientState.PERS_CAB_AUTH:
         
         if message.data == await TranslateMessage("Cancel", state): 
-                await main_menu_handler(message.message, state)
                 await state.set_state(ClientState.MAIN_MENU) 
-                #await message.message.delete()
-                await RemoveMessages()
+                await main_menu_handler(message.message, state)
                 return
             
         reqdata = message.data.split("|")  
                 
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
-        
-        
-        # print(result)
+ 
         if result[0] == 200:
             media_group = list()
-            # await bot.send_message(chatid, await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0]))
             count = 1
             for app in result[1]["Apps"]:
                 
@@ -537,9 +538,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         
         
  #Restarting the bot if the state is None
-@form_router.message(StateFilter(None))
-
-# @form_router.callback_query(StateFilter(None))
+@form_router.message(StateFilter(None)) 
 async def restart_handler(message: Message,  state: FSMContext) -> None:
   
   await command_start_handler(message, None, state)
