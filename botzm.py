@@ -43,7 +43,7 @@ PG_PASS = getenv("PG_PASS")
 storage = PGStorage(username='postgres', password=PG_PASS, db_name='zarmedbot_db')  
 # dp = Dispatcher(bot, storage=storage)
 # ------------------------------------------------------------
-
+ 
 
 # Credentials
 # Bot token can be obtained via https://t.me/BotFather
@@ -400,9 +400,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
                         
     for x in range(0, len(Appdates), 2):
         row = []
-        row.append(InlineKeyboardButton(text=Appdates[x].get("Date"), callback_data=Appdates[x].get("Date")))                 
+        row.append(InlineKeyboardButton(text=Appdates[x].get("Date"), callback_data=Appdates[x].get("Date")+'|'+userId+'|'+password  ))                 
         if len(Appdates) >= (x+2):                    
-                    row.append(InlineKeyboardButton(text=Appdates[x+1].get("Date"), callback_data=Appdates[x+1].get("Date")))
+                    row.append(InlineKeyboardButton(text=Appdates[x+1].get("Date"), callback_data=Appdates[x+1].get("Date")+'|'+userId+'|'+password ))
         buttons.append( row)
 
     
@@ -494,28 +494,33 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
                 #await message.message.delete()
                 await RemoveMessages()
                 return
+            
+        reqdata = message.data.split("|")  
                 
-        result = http1c.DBRequest('appapi/getAppD?appdata=' + str(message.data) + '&userid=00001411&ucode=57084919')
+        result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
         
         
         print(result)
         if result[0] == 200:
             media_group = list()
-            await bot.send_message(chatid, await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(message.data))
+            # await bot.send_message(chatid, await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0]))
+            count = 1
             for app in result[1]["Apps"]:
                 
-                count = 1
+                
                 for att in app["attachments"]:
                     bindata = base64.b64decode(att["base64data"])
-                    attnamefull = repl_forb(app["items"] + " "  ) + str(message.data) + "." + str(count) + att["attext"]
+                    attnamefull = repl_forb(app["items"] + " "  ) + str(reqdata[0]) + "." + str(count) + att["attext"]
                     
                     file = BufferedInputFile(bindata,attnamefull)
-                    media_group.append(InputMediaDocument(media=file))
-                    # await bot.send_document(message.message.chat.id,document=file)
-                    count = count +1
+              
+                    # caption = str(await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0])).replace('(N)', str(count))
+                    media_group.append(InputMediaDocument(media=file ))
+                    count = count+1
+                    
             await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT)   
         elif result[0] == 204: 
-            await bot.send_message(chatid, await TranslateMessage("Pers_area_appointment_nodata",state) )
+            await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         

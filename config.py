@@ -81,13 +81,13 @@ LANG_RU_EN_UZ =  {
     
     
   
-  "Pers_area_appointment_nodata": ["За данную дату документов не обнаружено.",
-                                "No data can be found for this date.",
-                                "За данную дату документов не обнаружено."],
+  "Pers_area_appointment_nodata": ["За дату (D) документов не обнаружено.",
+                                "No data can be found for the (D).",
+                                "За дату (D) документов не обнаружено."],
   
-  "Pers_area_appointment_yourapps": ["Ваши анализы и приемы врачей за дату ",
-                                "Your results and appointments for the date ",
-                                "Ваши анализы и приемы врачей за дату "],
+  "Pers_area_appointment_yourapps": ["Документ №(N) за дату ",
+                                "Document No.(N) for the date ",
+                                "Документ №(N) за дату "],
   
   
  
