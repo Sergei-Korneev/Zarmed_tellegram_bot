@@ -384,7 +384,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     await AddMessToRemove([msg1])
     
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
-    print(result)
+     
     if result[0] != 200:
         if result[0] == 401:
           await message.answer(await TranslateMessage("Pers_area_auth_wrong_auth_data", state))
@@ -394,6 +394,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
           return
     
     await RemoveMessages()
+    
+    ldays = result[1][0]
+    
     buttons = []
         
     Appdates = result[1]["AppDates"]
@@ -415,7 +418,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext) -> None:
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
         
 
-    msg2 = await message.answer("Выберите дату посещения: ", reply_markup=inline_kb1)
+    msg2 = await message.answer(await TranslateMessage("Pers_area_appointment_select_date_mes", state), reply_markup=inline_kb1)
     await AddMessToRemove([msg1,msg2])
 
     
