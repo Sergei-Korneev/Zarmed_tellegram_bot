@@ -1,7 +1,6 @@
 import config
 import requests
 from requests.auth import HTTPBasicAuth
-import base64
 from os import getenv
 
 ONEC_USER = getenv("ONEC_USER")
@@ -31,10 +30,4 @@ def DBRequest (url = ""):
   except Exception:
     return [ 3,  "", "An unknown error has occured." ] 
  
-
-
-#result = DBRequest('appapi/getApp?userid=00001411&ucode=57084919')
-#result = DBRequest('appapi/getAppD?appdata=03.06.2024&userid=00001411&ucode=57084919')
-result = DBRequest('appapi/getSet')
-print (result)
 
