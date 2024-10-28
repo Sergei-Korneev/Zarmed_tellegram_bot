@@ -37,10 +37,10 @@ qreader = QReader()
 # -------------------------------------------------------
 
 # ------------------- Postgres storage ---------------------
-from AiogramStorages.storages import PGStorage
+#from AiogramStorages.storages import PGStorage
 
-PG_PASS = getenv("PG_PASS")
-storage = PGStorage(username='postgres', password=PG_PASS, db_name='zarmedbot_db')  
+# PG_PASS = getenv("PG_PASS")
+# storage = PGStorage(username='postgres', password=PG_PASS, db_name='zarmedbot_db')  
 # dp = Dispatcher(bot, storage=storage)
 # ------------------------------------------------------------
  
