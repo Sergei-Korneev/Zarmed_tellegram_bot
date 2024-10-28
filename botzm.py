@@ -557,7 +557,7 @@ async def main() -> None:
     
     
     # And the run events dispatching
-    await dp.start_polling(bot, polling_timeout=15 , backoff_config=bk)
+    await dp.start_polling(bot, polling_timeout=10 , backoff_config=bk)
     
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
