@@ -80,9 +80,10 @@ class ClientState(StatesGroup):
 # Get settings
 async def GetSettings():
        result = http1c.DBRequest('appapi/getSet')
+       print(result)
        if result[0] == 200:
            global bot
-           bot = Bot(token=result["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+           bot = Bot(token=result[1]["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML))
  
 
 
