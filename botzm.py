@@ -395,6 +395,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
           msg = await message.answer(await TranslateMessage("Pers_area_auth_wrong_auth_data", state),reply_markup=inline_kb1)
           await  AddMessToRemove([msg])
           return
+        elif result[0] == 204:
+          msg = await message.answer(await TranslateMessage("Pers_area_appointment_select_no_app_for_date", state),reply_markup=inline_kb1)
+          return 
         else:
           msg = await message.answer(await TranslateMessage("General_err_un", state), reply_markup=inline_kb1)
           await AddMessToRemove([msg])

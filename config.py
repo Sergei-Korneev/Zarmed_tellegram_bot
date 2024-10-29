@@ -79,6 +79,10 @@ LANG_RU_EN_UZ =  {
                                      "The user data is incorrect or the user is not found. Try again.",
                                      "Данные пользователя неверны или пользователь не найден. Попробуйте еще раз."],
   
+    
+  "Pers_area_appointment_select_no_app_for_date": ["За текущий период посещений не найдено.",
+                                "No visits were found for the current period.",
+                                "За текущий период посещений не найдено."],
   
   
   "Pers_area_appointment_select_date_mes": ["Ваши посещения за последние (D) дней.",
