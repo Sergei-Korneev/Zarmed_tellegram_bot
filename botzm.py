@@ -402,11 +402,12 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     
     await RemoveMessages()
     
-    ldays = result[1]["Period"]
+   
     
     
     buttons = []   
-
+    ldays = result[1].get("Period")
+    print (ldays)
     Appdates = result[1]["AppDates"]
                         
     for x in range(0, len(Appdates), 2):
