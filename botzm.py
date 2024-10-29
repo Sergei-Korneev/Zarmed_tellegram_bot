@@ -55,7 +55,7 @@ qreader = QReader()
 # Credentials
 # Bot token can be obtained via https://t.me/BotFather
 #TOKEN = config.TELEGRAM_BOT_TOKEN
-TOKEN = getenv("BOT_TOKEN")
+#TOKEN = getenv("BOT_TOKEN")
 ONEC_USER = getenv("ONEC_USER")
 ONEC_PASS = getenv("ONEC_PASS")
 
