@@ -412,9 +412,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
                         
     for x in range(0, len(Appdates), 2):
         row = []
-        row.append(InlineKeyboardButton(text=Appdates[x].get("Date"), callback_data=Appdates[x].get("Date")+'|'+userId+'|'+password  ))                 
+        row.append(InlineKeyboardButton(text=Appdates[x]["Date"], callback_data=Appdates[x]["Date"]+'|'+userId+'|'+password  ))                 
         if len(Appdates) >= (x+2):                    
-                    row.append(InlineKeyboardButton(text=Appdates[x+1].get("Date"), callback_data=Appdates[x+1].get("Date")+'|'+userId+'|'+password ))
+                    row.append(InlineKeyboardButton(text=Appdates[x+1]["Date"], callback_data=Appdates[x+1]["Date"]+'|'+userId+'|'+password ))
         buttons.append(row)
 
     
