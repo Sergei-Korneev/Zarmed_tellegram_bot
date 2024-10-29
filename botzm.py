@@ -311,7 +311,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) -> None:
     
-    await CheckRestart(message=message)
+    await CheckRestart(message)
     
     userId = ''
     password = ''
