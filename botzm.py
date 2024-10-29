@@ -251,6 +251,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
                     )
                    
  
+    
     await message.answer(await TranslateMessage("Option_select_message", state), reply_markup=inline_kb1)
     await state.set_state(ClientState.MAIN_MENU)
 
@@ -310,7 +311,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) -> None:
     
- 
+    await CheckRestart(message=message)
     
     userId = ''
     password = ''
