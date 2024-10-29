@@ -351,6 +351,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
          
          if len(patterns) == 0:
                 await message.answer(await TranslateMessage("Pers_area_wrong_qr", state))
+                return
          else:
                 first_found_qr  = first_found_qr.split("?start=")[1]  
                 userId = first_found_qr[0:8]
