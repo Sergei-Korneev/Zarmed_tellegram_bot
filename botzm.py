@@ -402,7 +402,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     
     await RemoveMessages()
     
-    ldays = result.get("Period")
+    ldays = result[1]["Period"]
     
     
     buttons = []   
