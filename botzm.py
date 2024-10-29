@@ -44,6 +44,12 @@ qreader = QReader()
 # storage = PGStorage(username='postgres', password=PG_PASS, db_name='zarmedbot_db')  
 # dp = Dispatcher(bot, storage=storage)
 # ------------------------------------------------------------
+
+
+
+
+
+
  
 
 # Credentials
@@ -56,7 +62,8 @@ ONEC_PASS = getenv("ONEC_PASS")
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = None
+
 
 messages_del = []
 allargs = "" 
@@ -70,6 +77,14 @@ class ClientState(StatesGroup):
     PERS_CAB_AUTH = State()
     PERS_CAB_AUTH_BEGIN = State()
      
+# Get settings
+async def GetSettings():
+       result = http1c.DBRequest('appapi/getSet')
+       if result[0] == 200:
+           global bot
+           bot = Bot(token=result["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+ 
+
 
 
 # Text translation 
@@ -436,8 +451,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     await AddMessToRemove([msg1,msg2])
 
     
-     
-#result = DBRequest('appapi/getSet')
+
   
 
 # Callback handler
@@ -556,7 +570,10 @@ async def restart_handler(message: Message,  state: FSMContext) -> None:
 # Main function 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
- 
+    await GetSettings()
+    if bot == None:
+        logging.error("Cannot start bot (cannot get Token from server)")
+        return
     dp.include_router(form_router)
     
     bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
