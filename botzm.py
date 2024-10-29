@@ -406,7 +406,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     
     
     buttons = []   
-    ldays = str(result[1].get("Period"))
+    ldays = str(result[1]["Period"])
     print (ldays)
     Appdates = result[1]["AppDates"]
                         
