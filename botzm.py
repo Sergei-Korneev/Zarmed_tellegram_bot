@@ -9,7 +9,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InputMediaDocumen
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types.input_file import FSInputFile, BufferedInputFile
-from aiogram.utils.deep_linking import decode_payload
+#from aiogram.utils.deep_linking import decode_payload
 # from aiogram.methods.delete_message import DeleteMessage
  
 # QR Code reader
@@ -94,7 +94,7 @@ async def  TranslateMessage(MessageName: str, state: FSMContext) -> any:
      
     except:
         logging.error("Unable to translate the message: " + MessageName)
-        return "Message translation error."    
+        return "Message translation error"     
 
 
 
@@ -151,13 +151,17 @@ async def AddMessToRemove(messages: list[Message]):
        messages_del.append([message.chat.id, message.message_id])
  
  
- 
+     
+async def CheckRestart(message: Message, state: FSMContext):
+    if message.text == "/start":
+         await command_start_handler(message, None, state)
+         return True
+
   
  
  
-"""
-This handler receives messages with `/start` command
-"""
+# This handler receives messages with `/start` command
+
 
 @form_router.message(CommandStart(deep_link=True))
 async def command_start_handler(message: Message, command: CommandObject, state = FSMContext) -> None:
@@ -181,17 +185,13 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     config.LANG_RU_EN_UZ["Hello"][2]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][2] 
  
     await message.answer(msgtxt)
-    await lang_sel_handler(message, state)  
     await state.set_state(ClientState.LANG_SELECTION)
+    await lang_sel_handler(message, state)  
+    
   
    
-     
-async def CheckRestart(message: Message, state: FSMContext):
-    if message.text == "/start":
-         await command_start_handler(message, None, state)
-         return
 
- 
+ # Language selection handler
 @form_router.message(ClientState.LANG_SELECTION)
 async def lang_sel_handler_deleter(message: Message, state: FSMContext) -> None:
     await CheckRestart(message, state)
@@ -279,9 +279,7 @@ async def location_handler(message: Message, state: FSMContext) -> None:
 
 async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> None:
  
-    if message.text == "/start":
-        await command_start_handler(message, None, state)
-        return
+    if await CheckRestart(message, state): return
  
     
     
@@ -305,13 +303,15 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
     
  
  
- 
+ # Authorization process
 @form_router.message(ClientState.PERS_CAB_AUTH)
 
  
 async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) -> None:
     
-    await CheckRestart(message)
+    if await CheckRestart(message, state): return
+ 
+
     
     userId = ''
     password = ''
@@ -402,7 +402,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     
     await RemoveMessages()
     
-    #ldays = result[1][0]
+    ldays = result.get("Period")
+    
     
     buttons = []   
 
@@ -413,7 +414,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
         row.append(InlineKeyboardButton(text=Appdates[x].get("Date"), callback_data=Appdates[x].get("Date")+'|'+userId+'|'+password  ))                 
         if len(Appdates) >= (x+2):                    
                     row.append(InlineKeyboardButton(text=Appdates[x+1].get("Date"), callback_data=Appdates[x+1].get("Date")+'|'+userId+'|'+password ))
-        buttons.append( row)
+        buttons.append(row)
 
     
     buttons.append([
@@ -426,7 +427,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
            
         
 
-    msg2 = await message.answer(await TranslateMessage("Pers_area_appointment_select_date_mes", state), reply_markup=inline_kb1)
+    msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
     await AddMessToRemove([msg1,msg2])
 
     
@@ -539,7 +540,6 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
  #Restarting the bot if the state is None
 @form_router.message(StateFilter(None)) 
 async def restart_handler(message: Message,  state: FSMContext) -> None:
-  
   await command_start_handler(message, None, state)
   
   
@@ -555,7 +555,6 @@ async def main() -> None:
     dp.include_router(form_router)
     
     bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
-    
     
     # And the run events dispatching
     await dp.start_polling(bot, polling_timeout=10 , backoff_config=bk)
