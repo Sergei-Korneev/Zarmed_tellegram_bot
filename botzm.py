@@ -46,10 +46,6 @@ qreader = QReader()
 # ------------------------------------------------------------
 
 
-
-
-
-
  
 
 # Credentials
@@ -401,9 +397,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
            
     
-    #msg1 = await message.answer(await  TranslateMessage("Pers_area_auth_inprogress", state)) 
-
-    #await AddMessToRemove([msg1])
+ 
     
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
