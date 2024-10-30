@@ -420,7 +420,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
           await AddMessToRemove([msg])
           return
     
-    await RemoveMessages()
+    #await RemoveMessages()
     
    
     
