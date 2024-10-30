@@ -420,7 +420,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
           await AddMessToRemove([msg])
           return
     
-    #await RemoveMessages()
+    await RemoveMessages()
     
    
     
@@ -449,7 +449,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
         
 
     msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
-    await AddMessToRemove([msg1,msg2])
+    await AddMessToRemove([msg2])
 
     
 
