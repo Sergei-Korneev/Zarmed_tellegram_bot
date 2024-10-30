@@ -106,7 +106,7 @@ LANG_RU_EN_UZ =  {
   
   
   "General_err_un": ["Данная функция в данный момент недоступна.",
-                     "This function is not available at this time.",
+                     "This feature is not available at this time.",
                      "Данная функция в данный момент недоступна."]
 }
 
