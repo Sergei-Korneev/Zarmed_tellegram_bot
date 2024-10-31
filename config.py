@@ -8,7 +8,7 @@ ONEC_DB = 'zarmed'
 # BOT Settings
 LANG_EN_BUT = "🇬🇧 English"
 LANG_UZ_BUT = "🇺🇿 Uzbek"
-LANG_RU_BUT = "🇷🇺 Russian" 
+LANG_RU_BUT = "🇷🇺 Русский" 
 
 
 LANG_RU_EN_UZ =  {
