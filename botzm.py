@@ -410,7 +410,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
         # await message.answer(userId+" "+password)
          
     else:
-        await message.answer(await TranslateMessage("Pers_area_auth_wrong_input", state), reply_markup=inline_kb1)
+        msg =  await message.answer(await TranslateMessage("Pers_area_auth_wrong_input", state), reply_markup=inline_kb1)
+        await AddMessToRemove([msg])
         return
         
 
