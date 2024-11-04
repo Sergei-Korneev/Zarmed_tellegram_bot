@@ -251,6 +251,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None:
     if await CheckRestart(message, state): return
     await AddMessToRemove([message])
+    await RemoveMessages()
      
 
 async def main_menu_handler(message: Message, state: FSMContext) -> None:
@@ -335,7 +336,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
 async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
     
     if await CheckRestart(message, state): return
- 
+    
 
     
     userId = ''
