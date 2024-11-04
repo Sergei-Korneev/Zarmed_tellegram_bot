@@ -172,9 +172,10 @@ async def AddMessToRemove(messages: list[Message]):
 async def CheckRestart(message: Message, state: FSMContext):
     
     if message.text == "/start" or await state.get_state() == None:
-         if await state.get_state() == None:
-            await command_start_handler(message, None, state)
-            return True
+          global allargs
+          allargs = ''
+          await command_start_handler(message, None, state)
+          return True
 
   
          
@@ -347,8 +348,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
            userId = allargs[0:8]
            password = allargs[8:16]
     
-            
-           allargs = ""
+
     
     elif message.photo:    
 
