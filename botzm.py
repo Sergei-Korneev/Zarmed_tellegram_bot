@@ -342,6 +342,17 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
     userId = ''
     password = ''
     
+    buttons = []   
+    buttons.append([
+    InlineKeyboardButton(
+        text=await TranslateMessage("Cancel", state), 
+        callback_data=await TranslateMessage("Cancel", state)
+        )
+    ])
+    inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
+           
+    
+ 
     if allargs != "":
            userId = allargs[0:8]
            password = allargs[8:16]
@@ -399,20 +410,10 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
         # await message.answer(userId+" "+password)
          
     else:
-        await message.answer(await TranslateMessage("Pers_area_auth_wrong_input", state))
+        await message.answer(await TranslateMessage("Pers_area_auth_wrong_input", state), reply_markup=inline_kb1)
         return
         
-    buttons = []   
-    buttons.append([
-    InlineKeyboardButton(
-        text=await TranslateMessage("Cancel", state), 
-        callback_data=await TranslateMessage("Cancel", state)
-        )
-    ])
-    inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
-           
-    
- 
+
     
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
