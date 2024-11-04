@@ -49,16 +49,16 @@ qreader = QReader()
  
 
 # Credentials
-# Bot token can be obtained via https://t.me/BotFather
-#TOKEN = config.TELEGRAM_BOT_TOKEN
-#TOKEN = getenv("BOT_TOKEN")
-ONEC_USER = getenv("ONEC_USER")
-ONEC_PASS = getenv("ONEC_PASS")
+TOKEN = getenv("BOT_TOKEN")
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+#bot = None
+
+ 
 
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
-bot = None
+
 
 
 messages_del = []
@@ -71,7 +71,7 @@ class ClientState(StatesGroup):
     MAIN_MENU = State()
     MAIN_MENU_LOCATION = State()
     PERS_CAB_AUTH = State()
-    PERS_CAB_AUTH_BEGIN = State()
+    
      
 # Get settings
 async def GetSettings():
@@ -79,7 +79,8 @@ async def GetSettings():
        logging.info("Trying to get token. " + str(result))
        if result[0] == 200:
            global bot
-           bot = Bot(token=result[1]["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+           bot = Bot(token=result[1]["TgToken"],
+                     default=DefaultBotProperties(parse_mode=ParseMode.HTML))
  
 
 
@@ -158,28 +159,36 @@ async def RemoveMessages():
 
 
 async def AddMessToRemove(messages: list[Message]):
-    for message in messages:
-     if message != None:
-       messages_del.append([message.chat.id, message.message_id])
+    try:
+        for message in messages:
+            if message != None:
+                messages_del.append([message.chat.id, message.message_id])
+    except:
+        logging.info("Error adding message to remove list " + str([message.chat.id, message.message_id]))
+        
  
  
      
 async def CheckRestart(message: Message, state: FSMContext):
-    if message.text == "/start":
+    
+    if message.text == "/start" or await state.get_state() == None:
          await command_start_handler(message, None, state)
          return True
 
   
- 
+         
+#Restart the bot if the state is None
+@form_router.message(StateFilter(None)) 
+async def restart_handler(message: Message,  state: FSMContext) -> None:
+  await command_start_handler(message, None, state)
+  
  
 # This handler receives messages with `/start` command
-
-
 @form_router.message(CommandStart(deep_link=True))
 async def command_start_handler(message: Message, command: CommandObject, state = FSMContext) -> None:
     
     await state.clear()
- 
+    allargs = "" 
  
     if command != None:
         global allargs   
@@ -212,8 +221,7 @@ async def lang_sel_handler_deleter(message: Message, state: FSMContext) -> None:
     
     
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
-       
-    logging.info("lang selection handler ")
+ 
     
     inline_kb1 = InlineKeyboardMarkup(
                     inline_keyboard=[[
@@ -239,8 +247,9 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 # Main menu handler
 @form_router.message(ClientState.MAIN_MENU)
 async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None:
-    await CheckRestart(message, state)
-    await message.delete()
+    if await CheckRestart(message, state): return
+    await AddMessToRemove([message])
+     
 
 async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
@@ -269,10 +278,10 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
 
  
  
-# Location handler
-@form_router.message(ClientState.MAIN_MENU_LOCATION)
-async def loc_handler(message: Message, state: FSMContext) -> None:
-    await  message.delete()
+# # Location handler
+# @form_router.message(ClientState.MAIN_MENU_LOCATION)
+# async def loc_handler(message: Message, state: FSMContext) -> None:
+#     await  message.delete()
 
 async def location_handler(message: Message, state: FSMContext) -> None:
   
@@ -280,7 +289,7 @@ async def location_handler(message: Message, state: FSMContext) -> None:
    location = await TranslateMessage("Location1", state) 
    await message.answer_location(location[0], location[1])
    await message.answer(await TranslateMessage("Location1_Mess", state), parse_mode=ParseMode.HTML)
-   await state.set_state(ClientState.MAIN_MENU)
+#    await state.set_state(ClientState.MAIN_MENU)
  
    
    
@@ -291,8 +300,10 @@ async def location_handler(message: Message, state: FSMContext) -> None:
 
 async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> None:
  
+     
     if await CheckRestart(message, state): return
- 
+    
+    
     
     
     photo = FSInputFile("res/qr.jpg")
@@ -319,7 +330,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
 @form_router.message(ClientState.PERS_CAB_AUTH)
 
  
-async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) -> None:
+async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
     
     if await CheckRestart(message, state): return
  
@@ -416,13 +427,12 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     
     await RemoveMessages()
     
-   
     
-    
-    buttons = []   
+  
     ldays = str(result[1]["Period"])
-    print (ldays)
     Appdates = result[1]["AppDates"]
+     
+    buttons = []    
                         
     for x in range(0, len(Appdates), 2):
         row = []
@@ -445,77 +455,9 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, args=None) 
     msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
     await AddMessToRemove([msg2])
 
-    
-
-  
-
-# Callback handler
-
-@form_router.callback_query()
-async  def call_handler(message: CallbackQuery, state: FSMContext):
-    
-    chatid = message.message.chat.id
- 
-    
-    if await state.get_state() == None:
-        
-       await command_start_handler(message.message, None, state) 
-       return
-    
-    if await state.get_state() == ClientState.MAIN_MENU: 
-    
-        if message.data == await TranslateMessage("Option_location", state): 
-            await location_handler(message.message, state)  
-            await main_menu_handler(message.message, state)
-            await state.set_state(ClientState.MAIN_MENU) 
-            await message.message.delete()
-            return
-        
-        if message.data == await TranslateMessage("Option_language", state): 
-            await lang_sel_handler(message.message, state)    
-            await state.set_state(ClientState.LANG_SELECTION) 
-            await message.message.delete()
-            return
-        
-        if message.data == await TranslateMessage("Option_cabinet", state): 
-            await pers_cab_auth_begin_handler(message.message, state)    
-            # await state.set_state(ClientState.PERS_CAB_AUTH_BEGIN) 
-            await state.set_state(ClientState.PERS_CAB_AUTH)
-            await message.message.delete()
-            return
-    
-   
-
-        
-    if await state.get_state() == ClientState.LANG_SELECTION:
-    
-        if message.data != config.LANG_EN_BUT and message.data != config.LANG_UZ_BUT and message.data != config.LANG_RU_BUT: 
-          await  message.message.delete()
-          return
-        
- 
-        await state.update_data(LANG_SELECTION=message.data)
-        # data1 =  await state.get_data()
-        # logging.info( data1["LANG_SELECTION"])
-        if allargs != "":
-           await state.set_state(ClientState.PERS_CAB_AUTH) 
-           await pers_cab_auth_handler(message.message, state) 
-           return
-        
-        
-        await state.set_state(ClientState.MAIN_MENU) 
-        await AddMessToRemove([message.message])
-        await main_menu_handler(message.message, state)
-        return
-    
-    
-    if await state.get_state() == ClientState.PERS_CAB_AUTH:
-        
-        if message.data == await TranslateMessage("Cancel", state): 
-                await state.set_state(ClientState.MAIN_MENU) 
-                await main_menu_handler(message.message, state)
-                return
-            
+# Get documents 
+async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
+        chatid = message.message.chat.id
         reqdata = message.data.split("|")  
                 
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
@@ -542,20 +484,76 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         
+
+# Callback handler
+
+@form_router.callback_query()
+async  def call_handler(message: CallbackQuery, state: FSMContext):
+    
+    
+ 
+    
+    if await CheckRestart(message.message, state): return
+    
+    if await state.get_state() == ClientState.MAIN_MENU: 
+    
+        if message.data == await TranslateMessage("Option_location", state):
+            await AddMessToRemove([message.message]) 
+            await location_handler(message.message, state) 
+            await state.set_state(ClientState.MAIN_MENU) 
+            await main_menu_handler(message.message, state)
+            return
+        
+        if message.data == await TranslateMessage("Option_language", state): 
+            await AddMessToRemove([message.message])
+            await state.set_state(ClientState.LANG_SELECTION) 
+            await lang_sel_handler(message.message, state)    
+            return
+        
+        if message.data == await TranslateMessage("Option_cabinet", state): 
+            await AddMessToRemove([message.message])
+            await state.set_state(ClientState.PERS_CAB_AUTH) 
+            await pers_cab_auth_begin_handler(message.message, state)    
+            return
+    
+   
+
+        
+    if await state.get_state() == ClientState.LANG_SELECTION:
+    
+        if message.data != config.LANG_EN_BUT and message.data != config.LANG_UZ_BUT and message.data != config.LANG_RU_BUT: 
+          await AddMessToRemove([message.message])
+          return
+        
+ 
+        await state.update_data(LANG_SELECTION=message.data)
+        # data1 =  await state.get_data()
+        # logging.info( data1["LANG_SELECTION"])
+        if allargs != "":
+           await state.set_state(ClientState.PERS_CAB_AUTH) 
+           await pers_cab_auth_handler(message.message, state) 
+           return
+        
+        
+        await state.set_state(ClientState.MAIN_MENU) 
+        await AddMessToRemove([message.message])
+        await main_menu_handler(message.message, state)
+        return
+    
+    
+    if await state.get_state() == ClientState.PERS_CAB_AUTH:
+        
+        if message.data == await TranslateMessage("Cancel", state): 
+                await state.set_state(ClientState.MAIN_MENU) 
+                await main_menu_handler(message.message, state)
+                return
+        else:
+            await pers_cab_auth_get_app_handler(message, state)
+            return
+      
        
-     
-        
-        
-        
-        
-        
-        
-        
- #Restarting the bot if the state is None
-@form_router.message(StateFilter(None)) 
-async def restart_handler(message: Message,  state: FSMContext) -> None:
-  await command_start_handler(message, None, state)
-  
+    
+
   
   
   
@@ -565,10 +563,12 @@ async def restart_handler(message: Message,  state: FSMContext) -> None:
 # Main function 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
+    
     await GetSettings()
     if bot == None:
         logging.error("Cannot start bot (cannot get Token from server)")
         return
+    
     dp.include_router(form_router)
     
     bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
