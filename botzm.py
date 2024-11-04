@@ -193,11 +193,8 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     
     global allargs
     if command != None and command.args != "":
-           
-        allargs = command.args
-    else:
-          
-        allargs = ""
+       allargs = command.args
+ 
     
     #payload = decode_payload(args)
     #await message.answer(f"Your payload: {payload}")
