@@ -460,6 +460,15 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
 
     msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
     await AddMessToRemove([msg2])
+    await RemoveMessages() 
+
+
+
+
+
+
+
+
 
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
@@ -486,7 +495,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
                     count = count+1
                     
             await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT)  
-            await RemoveMessages() 
+            
         elif result[0] == 204: 
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
