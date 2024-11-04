@@ -172,9 +172,9 @@ async def AddMessToRemove(messages: list[Message]):
 async def CheckRestart(message: Message, state: FSMContext):
     
     if message.text == "/start" or await state.get_state() == None:
-         
-         await command_start_handler(message, None, state)
-         return True
+         if await state.get_state() == None:
+            await command_start_handler(message, None, state)
+            return True
 
   
          
@@ -191,7 +191,7 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     await state.clear()
     
  
-    if command != None:
+    if command != None and command.args != "":
         global allargs   
         allargs = command.args
     
