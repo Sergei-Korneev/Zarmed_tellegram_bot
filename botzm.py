@@ -348,7 +348,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
            password = allargs[8:16]
     
            global allargs
-           allargs != ""
+           allargs = ""
     
     elif message.photo:    
 
