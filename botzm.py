@@ -463,7 +463,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
 
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
-        # await RemoveMessages()
+        
         chatid = message.message.chat.id
         reqdata = message.data.split("|")  
                 
@@ -485,7 +485,8 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
                     media_group.append(InputMediaDocument(media=file ))
                     count = count+1
                     
-            await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT)   
+            await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT)  
+            await RemoveMessages() 
         elif result[0] == 204: 
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
