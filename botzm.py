@@ -415,7 +415,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
         return
         
 
-    
+    await RemoveMessages() 
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
     if result[0] != 200:
@@ -460,7 +460,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
 
     msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
     await AddMessToRemove([msg2])
-    await RemoveMessages() 
+    
 
 
 
