@@ -172,6 +172,7 @@ async def AddMessToRemove(messages: list[Message]):
 async def CheckRestart(message: Message, state: FSMContext):
     
     if message.text == "/start" or await state.get_state() == None:
+         
          await command_start_handler(message, None, state)
          return True
 
@@ -188,12 +189,12 @@ async def restart_handler(message: Message,  state: FSMContext) -> None:
 async def command_start_handler(message: Message, command: CommandObject, state = FSMContext) -> None:
     
     await state.clear()
-    allargs = "" 
+    
  
     if command != None:
         global allargs   
         allargs = command.args
- 
+    
     #payload = decode_payload(args)
     #await message.answer(f"Your payload: {payload}")
 
