@@ -49,9 +49,9 @@ qreader = QReader()
  
 
 # Credentials
-TOKEN = getenv("BOT_TOKEN")
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-#bot = None
+#TOKEN = getenv("BOT_TOKEN")
+#bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = None
 
  
 
