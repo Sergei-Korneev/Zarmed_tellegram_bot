@@ -309,7 +309,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
     if await CheckRestart(message, state): return
     
     
-    
+    await RemoveMessages()
     
     photo = FSInputFile("res/qr.jpg")
     msg1 = await message.answer_photo(photo=photo, caption=await TranslateMessage("Pers_area_hello", state))
@@ -327,7 +327,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
      
     msg = await message.answer(await TranslateMessage("Pers_area_cancel_button", state), reply_markup=inline_kb1, parse_mode=ParseMode.HTML)
     
-    await AddMessToRemove([msg, msg1, message])
+    await AddMessToRemove([msg, msg1])
     
  
  
@@ -551,7 +551,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         
         if message.data == await TranslateMessage("Cancel", state): 
                 await state.set_state(ClientState.MAIN_MENU) 
-                AddMessToRemove([message.message])
+                await AddMessToRemove([message.message])
                 await main_menu_handler(message.message, state)
                 return
         else:
