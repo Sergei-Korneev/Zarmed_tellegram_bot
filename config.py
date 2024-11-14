@@ -7,7 +7,7 @@ ONEC_DB = 'zarmed'
 
 # BOT Settings
 LANG_EN_BUT = "🇬🇧 English"
-LANG_UZ_BUT = "🇺🇿 Uzbek"
+LANG_UZ_BUT = "🇺🇿 O'zbek"
 LANG_RU_BUT = "🇷🇺 Русский" 
 PHONE_STR = "\n\n1063\n\n+998557021063\n\n\n"
 
