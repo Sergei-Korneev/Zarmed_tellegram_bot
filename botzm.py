@@ -197,7 +197,7 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     
     
     if command != None and command.args != "":
-       AllUsersIds.update({message.from_user.id:command.args})
+       AllUsersIds.update({message.from_user.id:str(command.args)})
        logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + command.args)
  
  
