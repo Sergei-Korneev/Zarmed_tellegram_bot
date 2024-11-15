@@ -49,9 +49,9 @@ qreader = QReader()
  
 
 # Credentials
-#TOKEN = getenv("BOT_TOKEN")
-#bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-bot = None
+TOKEN = getenv("BOT_TOKEN")
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+#bot = None
 
  
 
@@ -336,7 +336,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
 @form_router.message(ClientState.PERS_CAB_AUTH)
 
  
-async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: Message ) -> None:
+async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: Message = None) -> None:
     
     if await CheckRestart(message, state): return
     
@@ -354,10 +354,10 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
     ])
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
            
-    
-    UserId =  AllUsersIds.get(origmess.from_user.id)
-    logging.error("Trying to authorize with "+UserId)
-    if UserId != None:
+    if origmess != None:
+     UserId =  AllUsersIds.get(origmess.from_user.id)
+     logging.error("Trying to authorize with "+UserId)
+     if UserId != None:
            userId = UserId[0:8]
            password = UserId[8:16]
     
@@ -587,7 +587,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     
-    await GetSettings()
+    #await GetSettings()
     if bot == None:
         logging.error("Cannot start bot (cannot get Token from server)")
         return
