@@ -336,7 +336,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
 @form_router.message(ClientState.PERS_CAB_AUTH)
 
  
-async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
+async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: Message ) -> None:
     
     if await CheckRestart(message, state): return
     
@@ -355,7 +355,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
            
     
-    UserId =  AllUsersIds.get(message.from_user.id)
+    UserId =  AllUsersIds.get(origmess.from_user.id)
+    logging.error("Trying to authorize with "+UserId)
     if UserId != None:
            userId = UserId[0:8]
            password = UserId[8:16]
@@ -552,7 +553,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         UserId = AllUsersIds.get(message.from_user.id)
         if UserId != None:
            await state.set_state(ClientState.PERS_CAB_AUTH) 
-           await pers_cab_auth_handler(message.message, state) 
+           await pers_cab_auth_handler(message.message, state, message) 
            return
         
         
