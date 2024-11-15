@@ -567,6 +567,8 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         
         if message.data == await TranslateMessage("Cancel", state): 
                 await state.set_state(ClientState.MAIN_MENU) 
+                if AllUsersIds.get(message.from_user.id) != None:
+                   AllUsersIds.pop(message.from_user.id)
                 await AddMessToRemove([message.message])
                 await main_menu_handler(message.message, state)
                 return
