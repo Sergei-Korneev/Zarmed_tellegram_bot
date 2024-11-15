@@ -49,9 +49,9 @@ qreader = QReader()
  
 
 # Credentials
-#TOKEN = getenv("BOT_TOKEN")
-#bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-bot = None
+TOKEN = getenv("BOT_TOKEN")
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+#bot = None
 
  
 
@@ -61,8 +61,8 @@ dp = Dispatcher()
 
 
 
-messages_del = []
-allargs = "" 
+messages_del = {}
+AllUsersIds = {} 
 
 # FSM Class
 class ClientState(StatesGroup):
@@ -136,24 +136,19 @@ def repl_forb(string):
 
 
 
-async def RemoveMessages():
-    AllMsgs = []
-    
-    for i in messages_del:
-      AllMsgs.append(i[1])
-      chat_id = i[0]
-    #   try:
-          
-    #      await bot.delete_message(chat_id=i[0],message_id=i[1])
-    #   except:
-    #       logging.error("Unable to delete message: "  + str(i[0]) + " - " + str(i[1]) )
-    #       pass 
-    try: 
-      await bot.delete_messages(chat_id, AllMsgs)
+async def RemoveMessages(Chatid):
+ 
+    try:
+        
+     MessToDel = messages_del.get(Chatid)
+     if MessToDel == None:
+        return 
+     await bot.delete_messages(Chatid, MessToDel)
+       
     except:
         logging.error("Unable to delete message: " ) 
         pass
-    messages_del.clear()
+    messages_del.pop(Chatid)
 
 
 
@@ -162,18 +157,27 @@ async def AddMessToRemove(messages: list[Message]):
     try:
         for message in messages:
             if message != None:
-                messages_del.append([message.chat.id, message.message_id])
+                
+               ChatMessagesToDel: list
+               ChatMessagesToDel = messages_del.get(message.chat.id)
+               if ChatMessagesToDel == None:
+                   messages_del.update({message.chat.id:[message.message_id]})
+               else:
+                  ChatMessagesToDel.append(message.message_id)  
+                  messages_del.update({message.chat.id:ChatMessagesToDel})
     except:
         logging.info("Error adding message to remove list " + str([message.chat.id, message.message_id]))
         
+ 
  
  
      
 async def CheckRestart(message: Message, state: FSMContext):
     
     if message.text == "/start" or await state.get_state() == None:
-          global allargs
-          allargs = ''
+          if AllUsersIds.get(message.from_user.id) != None:
+             AllUsersIds.pop(message.from_user.id)
+          
           await command_start_handler(message, None, state)
           return True
 
@@ -191,16 +195,14 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     
     await state.clear()
     
-    global allargs
-    if command != None and command.args != "":
-       allargs = command.args
- 
     
+    if command != None and command.args != "":
+       AllUsersIds.update({message.from_user.id:command.args})
+       logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + command.args)
+ 
+ 
     #payload = decode_payload(args)
     #await message.answer(f"Your payload: {payload}")
-
- 
-    logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + allargs)
  
     msgtxt = \
     config.LANG_RU_EN_UZ["Hello"][0]+f"{html.bold(message.from_user.full_name)}! " + config.LANG_RU_EN_UZ["Hello_mess"][0] + '\n\n' + \
@@ -224,6 +226,7 @@ async def lang_sel_handler_deleter(message: Message, state: FSMContext) -> None:
     
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
  
+    await RemoveMessages(message.chat.id)
     
     inline_kb1 = InlineKeyboardMarkup(
                     inline_keyboard=[[
@@ -251,14 +254,14 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
 async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None:
     if await CheckRestart(message, state): return
     await AddMessToRemove([message])
-    await RemoveMessages()
+    await RemoveMessages(message.chat.id)
      
 
 async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
-    global allargs
-    allargs = ''
-    await RemoveMessages()
+    if AllUsersIds.get(message.from_user.id) != None:
+       AllUsersIds.pop(message.from_user.id)
+    await RemoveMessages(message.chat.id)
     
     Option_location_str = await TranslateMessage("Option_location", state)
     Option_cabinet_str =  await TranslateMessage("Option_cabinet", state)
@@ -307,7 +310,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
     if await CheckRestart(message, state): return
     
     
-    await RemoveMessages()
+    await RemoveMessages(message.chat.id)
     
     photo = FSInputFile("res/qr.jpg")
     msg1 = await message.answer_photo(photo=photo, caption=await TranslateMessage("Pers_area_hello", state))
@@ -352,10 +355,10 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
            
     
- 
-    if allargs != "":
-           userId = allargs[0:8]
-           password = allargs[8:16]
+    UserId =  AllUsersIds.get(message.from_user.id)
+    if UserId != None:
+           userId = UserId[0:8]
+           password = UserId[8:16]
     
 
     
@@ -414,8 +417,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
         await AddMessToRemove([msg])
         return
         
-
-    await RemoveMessages() 
+    
+    await RemoveMessages(message.chat.id) 
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
     if result[0] != 200:
@@ -431,7 +434,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext ) -> None:
           await AddMessToRemove([msg])
           return
     
-    await RemoveMessages()
+    await RemoveMessages(message.chat.id)
     
     
   
@@ -546,7 +549,8 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
         await state.update_data(LANG_SELECTION=message.data)
         # data1 =  await state.get_data()
         # logging.info( data1["LANG_SELECTION"])
-        if allargs != "":
+        UserId = AllUsersIds.get(message.from_user.id)
+        if UserId != None:
            await state.set_state(ClientState.PERS_CAB_AUTH) 
            await pers_cab_auth_handler(message.message, state) 
            return
@@ -582,7 +586,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     
-    await GetSettings()
+    #await GetSettings()
     if bot == None:
         logging.error("Cannot start bot (cannot get Token from server)")
         return
