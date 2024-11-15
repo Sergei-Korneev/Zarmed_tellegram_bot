@@ -49,9 +49,9 @@ qreader = QReader()
  
 
 # Credentials
-TOKEN = getenv("BOT_TOKEN")
-bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-#bot = None
+#TOKEN = getenv("BOT_TOKEN")
+#bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = None
 
  
 
@@ -586,7 +586,7 @@ async  def call_handler(message: CallbackQuery, state: FSMContext):
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     
-    #await GetSettings()
+    await GetSettings()
     if bot == None:
         logging.error("Cannot start bot (cannot get Token from server)")
         return
