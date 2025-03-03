@@ -81,22 +81,26 @@ LANG_RU_EN_UZ =  {
   
     
   "Pers_area_appointment_select_no_app_for_date": ["За текущий период посещений не найдено. Попробуйте позже, либо обратитесь по номерам:"+PHONE_STR,
-                                "No visits were found for the current period. Try again later, or contact us by phone:"+PHONE_STR,
-                                "Joriy davr uchun tashriflar topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
+                                                   "No visits were found for the current period. Try again later, or contact us by phone:"+PHONE_STR,
+                                                   "Joriy davr uchun tashriflar topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
   
   
   "Pers_area_appointment_select_date_mes": ["Ваши посещения за последние (D) дней.",
-                                "Your visits for the last (D) days.",
-                                "Oxirgi (D) kunlardagi tashriflaringiz."],
+                                            "Your visits for the last (D) days.",
+                                            "Oxirgi (D) kunlardagi tashriflaringiz."],
+  
+  "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D).",
+                                       "❗Unready tests for the date (D).",
+                                       "❗Sana uchun tugallanmagan tadqiqotlar (D)."],
     
   
   "Pers_area_appointment_nodata": ["За дату (D) документов не обнаружено. Попробуйте позже, либо обратитесь по номерам:"+PHONE_STR,
-                                "No documents were found for date (D). Try again later or contact us by phone:"+PHONE_STR,
-                                "(D) sana uchun hech qanday hujjat topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
+                                   "No documents were found for date (D). Try again later or contact us by phone:"+PHONE_STR,
+                                   "(D) sana uchun hech qanday hujjat topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
   
   "Pers_area_appointment_yourapps": ["Документ №(N) за дату ",
-                                "Document No.(N) for the date ",
-                                "Hujjat № (N) sana uchun "],
+                                     "Document No.(N) for the date ",
+                                     "Hujjat № (N) sana uchun "],
   
   
  

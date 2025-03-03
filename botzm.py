@@ -49,9 +49,9 @@ qreader = QReader()
  
 
 # Credentials
-#TOKEN = getenv("BOT_TOKEN")
-#bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-bot = None
+TOKEN = getenv("BOT_TOKEN")
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+#bot = None
 
  
 
@@ -483,22 +483,29 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
  
         if result[0] == 200:
-            media_group = list()
-            count = 1
-            for app in result[1]["Apps"]:
-                
-                
-                for att in app["attachments"]:
+
+            if int(result[1]["TotalCount"]) > 0:
+             media_group = list()
+             count = 1
+             for app in result[1]["Apps"]:
+                 for att in app["attachments"]:
                     bindata = base64.b64decode(att["base64data"])
                     attnamefull = repl_forb(app["items"] + " "  ) + str(reqdata[0]) + "." + str(count) + att["attext"]
                     
                     file = BufferedInputFile(bindata,attnamefull)
               
                     # caption = str(await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0])).replace('(N)', str(count))
-                    media_group.append(InputMediaDocument(media=file ))
-                    count = count+1
-                    
-            await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT)  
+                    media_group.append(InputMediaDocument(media=file))
+                    count = count+1       
+             await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT) 
+            
+            if int(result[1]["TotalCountNotReady"]) > 0: 
+                count = 1
+                not_ready_mess = await str(TranslateMessage("Pers_area_appointments_not_ready",state).replace("(D)", str(reqdata[0])))
+                for notready in result[1]["LabAppsNotReady"]:
+                   not_ready_mess = not_ready_mess + "\n" + str(count) + " " + notready["item"]
+                   count = count+1 
+                await bot.send_message(chatid, await TranslateMessage("General_err_un",state)) 
             
         elif result[0] == 204: 
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
