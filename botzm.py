@@ -503,7 +503,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
             
             if int(result[1]["TotalCountNotReady"]) > 0: 
                 count = 1
-                not_ready_mess = await str(await TranslateMessage("Pers_area_appointments_not_ready",state).replace("(D)", str(reqdata[0])))
+                not_ready_mess = await str(await TranslateMessage("Pers_area_appointments_not_ready",state)).replace("(D)", str(reqdata[0]))
                 for notready in result[1]["LabAppsNotReady"]:
                    not_ready_mess = not_ready_mess + "\n" + str(count) + " " + notready["item"]
                    count = count+1 
