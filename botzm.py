@@ -485,7 +485,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
         if result[0] == 200:
 
 
-          #try:
+          try:
             if int(result[1]["TotalCount"]) > 0:
              media_group = list()
              count = 1
@@ -508,8 +508,8 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
                    not_ready_mess = not_ready_mess + "\n" + str(count) + ") " + notready["item"]
                    count = count+1 
                 await bot.send_message(chatid, not_ready_mess) 
-          #except:
-              #await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+          except:
+              await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         elif result[0] == 204: 
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
