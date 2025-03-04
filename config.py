@@ -3,7 +3,7 @@
 # 1C Settings
 HTTP_TIMEOUT = 10
 ONEC_IP = '192.168.1.42'
-ONEC_DB = 'zarmed'
+ONEC_DB = 'mis'
 
 # BOT Settings
 LANG_EN_BUT = "🇬🇧 English"
@@ -89,9 +89,9 @@ LANG_RU_EN_UZ =  {
                                             "Your visits for the last (D) days.",
                                             "Oxirgi (D) kunlardagi tashriflaringiz."],
   
-  "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D).",
-                                       "❗Unready tests for the date (D).",
-                                       "❗Sana uchun tugallanmagan tadqiqotlar (D)."],
+  "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D):",
+                                       "❗Unready tests for the date (D):",
+                                       "❗Sana uchun tugallanmagan tadqiqotlar (D):"],
     
   
   "Pers_area_appointment_nodata": ["За дату (D) документов не обнаружено. Попробуйте позже, либо обратитесь по номерам:"+PHONE_STR,
