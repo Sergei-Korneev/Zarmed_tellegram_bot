@@ -363,7 +363,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
     
 
     
-    elif message.photo:    
+    elif  message.photo:    
 
      #try:
        img_stream = io.BytesIO()
@@ -407,7 +407,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
      #except:
         #logging.error("An exception occurred during qr decoding.") 
     
-    elif len(re.findall(r"^ {0,}[0-9]{8} {1,}[0-9]{8} {0,}$", message.text)) > 0 :
+    elif message != None and message.text != None and len(re.findall(r"^ {0,}[0-9]{8} {1,}[0-9]{8} {0,}$", message.text)) > 0 :
         loginpasspattern = str(re.findall(r"^ {0,}[0-9]{8} {1,}[0-9]{8} {0,}$", message.text)[0])
         userId = loginpasspattern.split()[0]
         password = loginpasspattern.split()[1]
