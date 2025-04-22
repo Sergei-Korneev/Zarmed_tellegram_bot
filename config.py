@@ -92,17 +92,16 @@ LANG_RU_EN_UZ =  {
   "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D):",
                                        "❗Unready tests for the date (D):",
                                        "❗Sana uchun tugallanmagan tadqiqotlar (D):"],
-    
+     
+  "Pers_area_appointments_ready":     ["✅ Готовые исследования за дату (D)",
+                                       "✅ Ready tests for the date (D)",
+                                       "✅ Sana uchun tugallangan tadqiqotlar (D)"],
+     
   
   "Pers_area_appointment_nodata": ["За дату (D) документов не обнаружено. Попробуйте позже, либо обратитесь по номерам:"+PHONE_STR,
                                    "No documents were found for date (D). Try again later or contact us by phone:"+PHONE_STR,
                                    "(D) sana uchun hech qanday hujjat topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
-  
-  "Pers_area_appointment_yourapps": ["Документ №(N) за дату ",
-                                     "Document No.(N) for the date ",
-                                     "Hujjat № (N) sana uchun "],
-  
-  
+   
  
   "Cancel": ["❌ Отмена",
              "❌ Cancel",

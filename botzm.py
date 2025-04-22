@@ -489,16 +489,20 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
             if int(result[1]["TotalCount"]) > 0:
              media_group = list()
              count = 1
+             ready_mess = str(await TranslateMessage("Pers_area_appointments_ready",state)).replace("(D)", str(reqdata[0]))
+             media_gr_caption = ready_mess
+             
              for app in result[1]["Apps"]:
                  for att in app["attachments"]:
                     bindata = base64.b64decode(att["base64data"])
                     attnamefull = repl_forb(app["items"] + " "  ) + str(reqdata[0]) + "." + str(count) + att["attext"]
                     
                     file = BufferedInputFile(bindata,attnamefull)
-              
-                    # caption = str(await TranslateMessage("Pers_area_appointment_yourapps",state) + " " + str(reqdata[0])).replace('(N)', str(count))
-                    media_group.append(InputMediaDocument(media=file))
-                    count = count+1       
+               
+                    media_group.append(InputMediaDocument(media=file, caption=media_gr_caption))
+                    count = count+1
+                    media_gr_caption=""
+                           
              await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT) 
             
             if int(result[1]["TotalCountNotReady"]) > 0: 
