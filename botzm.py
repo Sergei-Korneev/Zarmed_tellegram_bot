@@ -490,7 +490,8 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
              media_group = list()
              count = 1
              ready_mess = str(await TranslateMessage("Pers_area_appointments_ready",state)).replace("(D)", str(reqdata[0]))
-             media_gr_caption = ready_mess
+             
+             await bot.send_message(chatid, ready_mess) 
              
              for app in result[1]["Apps"]:
                  for att in app["attachments"]:
@@ -499,9 +500,9 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
                     
                     file = BufferedInputFile(bindata,attnamefull)
                
-                    media_group.append(InputMediaDocument(media=file, caption=media_gr_caption))
+                    media_group.append(InputMediaDocument(media=file))
                     count = count+1
-                    media_gr_caption=""
+                   
                            
              await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT) 
             
