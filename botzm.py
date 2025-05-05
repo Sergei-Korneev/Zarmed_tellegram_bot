@@ -478,15 +478,13 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
         
-        chatid = message.message.chat.id
-        reqdata = message.data.split("|")  
+    chatid = message.message.chat.id
+    reqdata = message.data.split("|")  
         
         
-        try:        
-         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
-        except:
-            await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
-            return
+    try:        
+        result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
+        
         
         
         if result[0] == 200:
@@ -526,6 +524,9 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+    except:
+            await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+        
         
 
 # Callback handler
