@@ -482,7 +482,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
     reqdata = message.data.split("|")  
         
         
-    try:        
+    #try:        
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
         
         
@@ -524,8 +524,10 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
-    except:
-            await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+    #except:
+            
+            
+            #await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         
         
 
