@@ -478,8 +478,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
         
-    chatid = message.message.chat.id
-    reqdata = message.data.split("|")  
+        chatid = message.message.chat.id
+        reqdata = message.data.split("|")  
         
         
     #try:        
