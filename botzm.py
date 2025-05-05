@@ -420,6 +420,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
         
     
     await RemoveMessages(message.chat.id) 
+    
     result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
     if result[0] != 200:
@@ -479,9 +480,15 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
         
         chatid = message.message.chat.id
         reqdata = message.data.split("|")  
-                
-        result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
- 
+        
+        
+        try:        
+         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
+        except:
+            await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+            return
+        
+        
         if result[0] == 200:
 
 
