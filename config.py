@@ -29,7 +29,7 @@ LANG_RU_EN_UZ =  {
                       "📞 Contacts and locations",
                       "📞 Kontaktlar va manzillar"],
   
-  "Option_cabinet": ["👤 Анализы и приемы",
+  "Option_cabinet": ["👤 Анализы и приемы врача",
                      "👤 Lab tests and visits",
                      "👤 Test natijalari va shifokor qabuliga"],
   
