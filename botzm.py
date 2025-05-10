@@ -311,7 +311,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
     if await CheckRestart(message, state): return
     
     
-    await RemoveMessages(message.chat.id)
+   
     
     photo = FSInputFile("res/qr.jpg")
     msg1 = await message.answer_photo(photo=photo, caption=await TranslateMessage("Pers_area_hello", state))
@@ -328,7 +328,7 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
  
      
     msg = await message.answer(await TranslateMessage("Pers_area_cancel_button", state), reply_markup=inline_kb1, parse_mode=ParseMode.HTML)
-    
+    await RemoveMessages(message.chat.id)
     await AddMessToRemove([msg, msg1])
     
  
