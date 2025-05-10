@@ -263,7 +263,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
     
     if AllUsersIds.get(message.from_user.id) != None:
        AllUsersIds.pop(message.from_user.id)
-    await RemoveMessages(message.chat.id)
+   
     
     Option_location_str = await TranslateMessage("Option_location", state)
     Option_cabinet_str =  await TranslateMessage("Option_cabinet", state)
@@ -282,6 +282,7 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
  
     
     await message.answer(await TranslateMessage("Option_select_message", state), reply_markup=inline_kb1)
+    await RemoveMessages(message.chat.id)
     await state.set_state(ClientState.MAIN_MENU)
 
  
