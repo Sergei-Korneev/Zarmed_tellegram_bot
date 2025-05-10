@@ -144,11 +144,12 @@ async def RemoveMessages(Chatid):
      if MessToDel == None:
         return 
      await bot.delete_messages(Chatid, MessToDel)
+     messages_del.pop(Chatid)
        
     except:
         logging.error("Unable to delete message: " ) 
         pass
-    messages_del.pop(Chatid)
+   
 
 
 
@@ -478,11 +479,13 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
         
+         
+        
+        
+    try: 
         chatid = message.message.chat.id
-        reqdata = message.data.split("|")  
-        
-        
-    #try:        
+        reqdata = message.data.split("|") 
+               
         result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
         
         
@@ -524,10 +527,8 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
             await bot.send_message(chatid, str(await TranslateMessage("Pers_area_appointment_nodata",state)).replace("(D)", str(reqdata[0])) )
         else:
             await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
-    #except:
-            
-            
-            #await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
+    except:
+        await bot.send_message(chatid, await TranslateMessage("General_err_un",state) )
         
         
 
