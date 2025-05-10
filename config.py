@@ -29,8 +29,8 @@ LANG_RU_EN_UZ =  {
                       "📞 Contacts and locations",
                       "📞 Kontaktlar va manzillar"],
   
-  "Option_cabinet": ["👤 Персональный кабинет",
-                     "👤 Personalized User Area",
+  "Option_cabinet": ["👤 Анализы и приемы",
+                     "👤 Lab tests and visits",
                      "👤 Shaxsiy kabinet"],
   
   "Option_language": ["🇷🇺 Выбрать язык",
