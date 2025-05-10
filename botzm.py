@@ -227,7 +227,7 @@ async def lang_sel_handler_deleter(message: Message, state: FSMContext) -> None:
     
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
  
-    await RemoveMessages(message.chat.id)
+    
     
     inline_kb1 = InlineKeyboardMarkup(
                     inline_keyboard=[[
@@ -243,6 +243,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
         
     msg = await message.answer(messtxt, reply_markup=inline_kb1)
     await state.set_state(ClientState.LANG_SELECTION)
+    await RemoveMessages(message.chat.id)
     await AddMessToRemove([msg])
     
             
