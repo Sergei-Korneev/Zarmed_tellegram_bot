@@ -30,7 +30,7 @@ LANG_RU_EN_UZ =  {
                       "📞 Kontaktlar va manzillar"],
   
   "Option_cabinet": ["👤 Результаты анализов и приемы врача",
-                     '👤 Lab tests and doctor\'s visits',
+                     "👤 Lab tests and visits",
                      "👤 Test natijalari va shifokor qabuliga"],
   
   "Option_language": ["🇷🇺 Выбрать язык",
