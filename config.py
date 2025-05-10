@@ -31,7 +31,7 @@ LANG_RU_EN_UZ =  {
   
   "Option_cabinet": ["👤 Анализы и приемы",
                      "👤 Lab tests and visits",
-                     "👤 Shaxsiy kabinet"],
+                     "👤 Test natijalari va shifokor qabuliga"],
   
   "Option_language": ["🇷🇺 Выбрать язык",
                       "🇬🇧 Select language",
