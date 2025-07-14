@@ -146,8 +146,8 @@ async def RemoveMessages(Chatid):
      await bot.delete_messages(Chatid, MessToDel)
      messages_del.pop(Chatid)
        
-    except:
-        logging.error("Unable to delete message: " ) 
+    except  Exception as error:
+        logging.error("Unable to delete message: " , error ) 
         pass
    
 
@@ -237,7 +237,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
                         ]]
                     )
  
-    messtxt = config.LANG_RU_EN_UZ["Select_Lang_err"][0] + "\n" + \
+    messtxt =     config.LANG_RU_EN_UZ["Select_Lang_err"][0] + "\n" + \
                   config.LANG_RU_EN_UZ["Select_Lang_err"][1] + "\n" + \
                   config.LANG_RU_EN_UZ["Select_Lang_err"][2] + "\n" 
         
