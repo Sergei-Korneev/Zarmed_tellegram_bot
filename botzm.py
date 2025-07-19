@@ -148,6 +148,7 @@ async def RemoveMessages(Chatid):
        
     except  Exception as error:
         logging.error("Unable to delete message: " , error ) 
+        messages_del.pop(Chatid)
         pass
    
 
