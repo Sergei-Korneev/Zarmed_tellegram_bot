@@ -511,8 +511,13 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
                     
                     file = BufferedInputFile(bindata,attnamefull)
                
-                    media_group.append(InputMediaDocument(media=file))
-                    count = count+1
+                    if count == 10:
+                         await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT) 
+                         media_group.clear()
+                         count = 1
+                    else:
+                        media_group.append(InputMediaDocument(media=file))
+                        count = count+1
                    
                            
              await bot.send_media_group(chat_id=chatid,media=media_group, request_timeout=config.HTTP_TIMEOUT) 
