@@ -507,7 +507,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
              for app in result[1]["Apps"]:
                  for att in app["attachments"]:
                     bindata = base64.b64decode(att["base64data"])
-                    attnamefull = repl_forb(app["items"] + " "  ) + str(reqdata[0]) + "." + str(count) + att["attext"]
+                    attnamefull = repl_forb(app["items"] + " "  ) + str(reqdata[0]) + "."  + att["attext"]
                     
                     file = BufferedInputFile(bindata,attnamefull)
                
