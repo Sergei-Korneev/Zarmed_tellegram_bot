@@ -85,9 +85,9 @@ LANG_RU_EN_UZ =  {
                                                    "Joriy davr uchun tashriflar topilmadi. Keyinroq qayta urinib ko'ring yoki raqamlarga qo'ng'iroq qiling:"+PHONE_STR],
   
   
-  "Pers_area_appointment_select_date_mes": ["Ваши посещения за последние (D) дней.",
-                                            "Your visits for the last (D) days.",
-                                            "Oxirgi (D) kunlardagi tashriflaringiz."],
+  "Pers_area_appointment_select_date_mes": ["Ваши посещения за последние (D) дней.\nНажимайте кнопку нужной даты, чтобы проверить готовность анализов.",
+                                            "Your visits for the last (D) days.\nPress the date button to check the availability of your tests results.",
+                                            "Oxirgi (D) kunlardagi tashriflaringiz.\nSinovlarning tayyorligini tekshirish uchun kerakli sana tugmasini bosing."],
   
   "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D):",
                                        "❗Unready tests for the date (D):",

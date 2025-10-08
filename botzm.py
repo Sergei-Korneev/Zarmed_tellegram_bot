@@ -199,7 +199,7 @@ async def command_start_handler(message: Message, command: CommandObject, state 
     
     
     if command != None and command.args != "":
-       AllUsersIds.update({message.from_user.id:str(command.args)})
+       AllUsersIds.update({message.from_user.id:str(command.args)}) 
        logging.info("The user with name '" + message.from_user.full_name + "' has started the bot with params: " + command.args)
  
  
@@ -360,7 +360,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
            
     if origmess != None:
      UserId =  AllUsersIds.get(origmess.from_user.id)
-     logging.error("Trying to authorize with "+UserId)
+     logging.info("Trying to authorize with "+UserId)
      if UserId != None:
            userId = UserId[0:8]
            password = UserId[8:16]
