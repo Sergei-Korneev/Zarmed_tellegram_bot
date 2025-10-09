@@ -87,7 +87,7 @@ LANG_RU_EN_UZ =  {
   
   "Pers_area_appointment_select_date_mes": ["Ваши посещения за последние (D) дней.\nНажимайте кнопку нужной даты, чтобы проверить готовность анализов.",
                                             "Your visits for the last (D) days.\nPress the date button to check the availability of your tests results.",
-                                            "Oxirgi (D) kunlardagi tashriflaringiz.\nSinovlarning tayyorligini tekshirish uchun kerakli sana tugmasini bosing."],
+                                            "Oxirgi (D) kunlardagi tashriflaringiz.\nTahlillar tayyorligini tekshirish uchun kerekli sana tugmasini bosing."],
   
   "Pers_area_appointments_not_ready": ["❗Неготовые исследования за дату (D):",
                                        "❗Unready tests for the date (D):",
