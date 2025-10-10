@@ -2,7 +2,7 @@
 
 # 1C Settings
 HTTP_TIMEOUT = 10
-ONEC_IP = '192.168.1.42'
+ONEC_IP = '127.0.0.1'
 ONEC_DB = 'mis'
 
 # BOT Settings
