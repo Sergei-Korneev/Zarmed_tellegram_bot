@@ -63,13 +63,7 @@ bot = None
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
-# HTTP session
-session = ClientSession(
-    connector=TCPConnector(
-        ssl=False,
-        family=0
-    )
-)
+ 
 
 
 messages_del = {}
