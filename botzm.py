@@ -63,7 +63,13 @@ bot = None
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
-
+# HTTP session
+session = ClientSession(
+    connector=TCPConnector(
+        ssl=False,
+        family=0
+    )
+)
 
 
 messages_del = {}
@@ -636,7 +642,7 @@ async def main() -> None:
     bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
     
     # And the run events dispatching
-    await dp.start_polling(bot, polling_timeout=10 , backoff_config=bk)
+    await dp.start_polling(bot, polling_timeout=30 , backoff_config=bk)
     
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
