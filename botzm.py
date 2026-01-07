@@ -88,7 +88,8 @@ async def GetSettings():
  
            bot = Bot(token=result[1]["TgToken"],
                      default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-                     session=ClientSession(connector=TCPConnector(ssl=False, family=0))
+                     session=ClientSession(connector=TCPConnector(ssl=False, family=0),
+                     timeout=30)
            )
 
 
