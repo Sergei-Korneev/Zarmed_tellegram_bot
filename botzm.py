@@ -85,16 +85,11 @@ async def GetSettings():
        if result[0] == 200:
            global bot
            
-           session = ClientSession(
-             connector=TCPConnector(
-             ssl=False,      # disable SSL verification
-             family=0        # disable IPv6
-           )
-)
+ 
            bot = Bot(token=result[1]["TgToken"],
                      default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-                     session=session)
- 
+                     session=ClientSession(connector=TCPConnector(ssl=False, family=0))
+           )
 
 
 
