@@ -13,12 +13,7 @@ from aiogram.types.input_file import FSInputFile, BufferedInputFile
 # from aiogram.methods.delete_message import DeleteMessage
 from aiohttp import ClientSession, TCPConnector
 
-session = ClientSession(
-    connector=TCPConnector(
-        ssl=False,      # disable SSL verification
-        family=0        # disable IPv6
-    )
-)
+
 
 
 
@@ -89,6 +84,13 @@ async def GetSettings():
        logging.info("Trying to get token. " + str(result))
        if result[0] == 200:
            global bot
+           
+           session = ClientSession(
+             connector=TCPConnector(
+             ssl=False,      # disable SSL verification
+             family=0        # disable IPv6
+           )
+)
            bot = Bot(token=result[1]["TgToken"],
                      default=DefaultBotProperties(parse_mode=ParseMode.HTML),
                      session=session)
