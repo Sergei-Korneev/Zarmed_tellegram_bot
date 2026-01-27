@@ -63,8 +63,7 @@ bot = None
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
- 
-
+session = ClientSession(connector=TCPConnector(ssl=False, family=0))
 
 messages_del = {}
 AllUsersIds = {} 
@@ -85,9 +84,8 @@ async def GetSettings():
        if result[0] == 200:
            global bot
            
- 
-           bot = Bot(token=result[1]["TgToken"],
-                     default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+           connector = TCPConnector(family=0,ssl=False)  # IPv4 only
+           bot = Bot(token=result[1]["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML), session=session, connector=connector)
            
 
 
