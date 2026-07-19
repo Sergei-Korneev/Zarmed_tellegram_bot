@@ -256,10 +256,7 @@ async def lang_sel_handler(message: Message, state: FSMContext) -> None:
     await AddMessToRemove([msg])
     
             
-
-
  
-
 # Main menu handler
 @form_router.message(ClientState.MAIN_MENU)
 async def main_menu_handler_deleter(message: Message, state: FSMContext) -> None:
@@ -289,7 +286,6 @@ async def main_menu_handler(message: Message, state: FSMContext) -> None:
                     )
                    
  
-    
     await message.answer(await TranslateMessage("Option_select_message", state), reply_markup=inline_kb1)
     await RemoveMessages(message.chat.id)
     await state.set_state(ClientState.MAIN_MENU)
@@ -321,9 +317,6 @@ async def pers_cab_auth_begin_handler(message: Message, state: FSMContext) -> No
      
     if await CheckRestart(message, state): return
     
-    
-   
-    
     photo = FSInputFile("res/qr.jpg")
     msg1 = await message.answer_photo(photo=photo, caption=await TranslateMessage("Pers_area_hello", state))
     
@@ -353,7 +346,6 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
     if await CheckRestart(message, state): return
     
 
-    
     userId = ''
     password = ''
     
@@ -474,8 +466,6 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
     ])
     inline_kb1 = InlineKeyboardMarkup(inline_keyboard=buttons)
            
-        
-
     msg2 = await message.answer(str(await TranslateMessage("Pers_area_appointment_select_date_mes", state)).replace("(D)",ldays), reply_markup=inline_kb1)
     await AddMessToRemove([msg2])
     
@@ -491,8 +481,7 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
 # Get documents 
 async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContext ) -> None:
         
-         
-        
+ 
     await message.answer()    
     try:
         
