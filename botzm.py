@@ -63,7 +63,8 @@ bot = None
 # All handlers should be attached to the Router (or Dispatcher)
 form_router = Router()
 dp = Dispatcher()
-session = ClientSession(connector=TCPConnector(ssl=False, family=0))
+ 
+
 
 messages_del = {}
 AllUsersIds = {} 
@@ -79,13 +80,15 @@ class ClientState(StatesGroup):
      
 # Get settings
 async def GetSettings():
-       result = http1c.DBRequest('appapi/getSet')
+       result = await asyncio.to_thread(http1c.DBRequest,'appapi/getSet')
+       #result = http1c.DBRequest('appapi/getSet')
        logging.info("Trying to get token. " + str(result))
        if result[0] == 200:
            global bot
            
            connector = TCPConnector(family=0,ssl=False)  # IPv4 only
-           bot = Bot(token=result[1]["TgToken"], default=DefaultBotProperties(parse_mode=ParseMode.HTML), session=session, connector=connector)
+           bot = Bot(token=result[1]["TgToken"],
+                     default=DefaultBotProperties(parse_mode=ParseMode.HTML), connector = connector)
            
 
 
@@ -152,7 +155,7 @@ async def RemoveMessages(Chatid):
      messages_del.pop(Chatid)
        
     except  Exception as error:
-        logging.error("Unable to delete message: " , error ) 
+        logging.error("Unable to delete message: %s", error) 
         messages_del.pop(Chatid)
         pass
    
@@ -180,13 +183,15 @@ async def AddMessToRemove(messages: list[Message]):
  
      
 async def CheckRestart(message: Message, state: FSMContext):
-    
+  try:  
     if message.text == "/start" or await state.get_state() == None:
           if AllUsersIds.get(message.from_user.id) != None:
              AllUsersIds.pop(message.from_user.id)
           
           await command_start_handler(message, None, state)
           return True
+  except:
+          return False
 
   
          
@@ -232,9 +237,7 @@ async def lang_sel_handler_deleter(message: Message, state: FSMContext) -> None:
     
     
 async def lang_sel_handler(message: Message, state: FSMContext) -> None:
- 
-    
-    
+  
     inline_kb1 = InlineKeyboardMarkup(
                     inline_keyboard=[[
                         InlineKeyboardButton(text=config.LANG_UZ_BUT, callback_data=config.LANG_UZ_BUT),
@@ -430,7 +433,8 @@ async def pers_cab_auth_handler(message: Message, state: FSMContext, origmess: M
     
     await RemoveMessages(message.chat.id) 
     
-    result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
+    result = await asyncio.to_thread(http1c.DBRequest,'appapi/getApp?userid=' + userId+ '&ucode=' + password)
+    #result = http1c.DBRequest('appapi/getApp?userid=' + userId+ '&ucode=' + password)
      
     if result[0] != 200:
         if result[0] == 401:
@@ -489,13 +493,14 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
         
          
         
+    await message.answer()    
+    try:
         
-    try: 
         chatid = message.message.chat.id
         reqdata = message.data.split("|") 
                
-        result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
-        
+        #result = http1c.DBRequest('appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
+        result = await asyncio.to_thread(http1c.DBRequest,'appapi/getAppD?appdata=' + str(reqdata[0]) + '&userid='+ str(reqdata[1]) + '&ucode='+ str(reqdata[2]))
         
         
         if result[0] == 200:
@@ -552,7 +557,7 @@ async def pers_cab_auth_get_app_handler(message: CallbackQuery, state: FSMContex
 async  def call_handler(message: CallbackQuery, state: FSMContext):
     
     
- 
+    await message.answer()
     
     if await CheckRestart(message.message, state): return
     
@@ -634,7 +639,8 @@ async def main() -> None:
     bk = BackoffConfig(min_delay=0.5, max_delay=2.0, factor=1.3, jitter=0.1)
     
     # And the run events dispatching
-    await dp.start_polling(bot, polling_timeout=30 , backoff_config=bk)
+    #await dp.start_polling(bot, polling_timeout=30 , backoff_config=bk)
+    await dp.start_polling(bot, polling_timeout=20)
     
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
